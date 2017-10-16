@@ -11,8 +11,8 @@
     "subnet": {
       "value": "front_subnet"
     },
-    "keyVaultGroup": {
-      "value": "my-common"
+    "vmSize": {
+      "value": "Standard_A1"
     }
   }
 }
