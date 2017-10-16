@@ -24,7 +24,7 @@
   },
   "variables": {
     "cleanPrefix": "[toLower(replace(parameters('prefix'),'-', ''))]",
-    "acrName": "[concat(variables('cleanPrefix'), '-acr-' , uniqueString(resourceGroup().id))]",
+    "acrName": "[concat(variables('cleanPrefix'), 'registry' , uniqueString(resourceGroup().id))]",
     "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
   },
   "resources": [{
@@ -36,7 +36,7 @@
     "dependsOn": [],
     "tags": {
       "displayName": "Container Registry",
-      "container.registry": "[parameters('acrName')]"
+      "container.registry": "[variables('acrName')]"
     },
     "properties": {
       "adminUserEnabled": "[parameters('acrAdminUserEnabled')]",
@@ -48,7 +48,7 @@
   }],
   "outputs": {
     "acrLoginServer": {
-      "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries',parameters('acrName')),'2016-06-27-preview').loginServer]",
+      "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries',variables('acrName')),'2016-06-27-preview').loginServer]",
       "type": "string"
     }
   }
