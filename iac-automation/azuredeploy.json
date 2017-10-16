@@ -114,7 +114,7 @@
     "cleanResourceGroup": "[toLower(replace(resourceGroup().name,'-', ''))]",
     "automationAccountName": "[concat(variables('cleanResourceGroup'), '-automate')]",
     "assetLocation": "[concat('https://', parameters('storageAccountName'), '.blob.core.windows.net')]",
-    "omsWorkspaceName": "[concat(variables('cleanResourceGroup'), '-oms')]",
+    "omsWorkspaceName": "[concat(variables('cleanResourceGroup'), '-oms', uniqueString(resourceGroup().id))]",
     "omsWorkspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('omsWorkspaceName'))]",
     "batch1": {
       "solutions": [{
