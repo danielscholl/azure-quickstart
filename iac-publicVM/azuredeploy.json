@@ -81,16 +81,37 @@
       },
       "defaultValue": "Internet"
     },
-    "adminUserName": {
+    "domain": {
       "type": "string",
       "metadata": {
-        "description": "Local Machine Admin User Password"
+        "description": "The FQDN of the AD domain"
       }
     },
-    "adminPassword": {
+    "domainOptions": {
+      "type": "int",
+      "defaultValue": 3,
+      "metadata": {
+        "description": "Set of bit flags that define the join options. Default value of 3 is a combination of NETSETUP_JOIN_DOMAIN (0x00000001) & NETSETUP_ACCT_CREATE (0x00000002) i.e. will join the domain and create the account on the domain. For more information see https://msdn.microsoft.com/en-us/library/aa392154(v=vs.85).aspx"
+      }
+    },
+    "username": {
+      "type": "string",
+      "metadata": {
+        "description": "Domain Admin Account Name also used as Local Machine Admin User"
+      },
+      "defaultValue": "domainAdmin"
+    },
+    "password": {
       "type": "securestring",
       "metadata": {
-        "description": "Local Machine Admin User Password"
+        "description": "Domain Admin Account Password also used as Local Machine Admin User Password"
+      }
+    },
+    "ouPath": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Specifies an organizational unit (OU) for the domain account. Enter the full distinguished name of the OU in quotation marks. Example: 'OU=testOU; DC=domain; DC=Domain; DC=com"
       }
     }
   },
@@ -201,8 +222,8 @@
         },
         "osProfile": {
           "computerName": "[parameters('vmName')]",
-          "adminUsername": "[parameters('adminUserName')]",
-          "adminPassword": "[parameters('adminPassword')]"
+          "adminUsername": "[parameters('username')]",
+          "adminPassword": "[parameters('password')]"
         },
         "storageProfile": {
           "imageReference": {
@@ -279,7 +300,7 @@
           "apiVersion": "2016-04-30-preview",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-	    "[parameters('vmName')]"
+            "[parameters('vmName')]"
           ],
           "tags": {
             "displayName": "OMSExtension"
@@ -294,6 +315,31 @@
             },
             "protectedSettings": {
               "workspaceKey": "[parameters('omsKey')]"
+            }
+          }
+        },
+        {
+          "apiVersion": "2015-06-15",
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "name": "[concat(parameters('vmName'), '/DomainJoinExtension')]",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[parameters('vmName')]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "JsonADDomainExtension",
+            "typeHandlerVersion": "1.3",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "Name": "[parameters('domain')]",
+              "OUPath": "[parameters('ouPath')]",
+              "User": "[concat(parameters('domain'), '\\', parameters('username'))]",
+              "Restart": "true",
+              "Options": "[parameters('domainOptions')]"
+            },
+            "protectedSettings": {
+              "Password": "[parameters('password')]"
             }
           }
         }
