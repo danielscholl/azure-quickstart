@@ -1,0 +1,113 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "prefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Small unique string."
+      },
+      "minLength": 2,
+      "maxLength": 7
+    },
+    "vmName": {
+      "type": "string",
+      "defaultValue": "vm1"
+    },
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Standard_DS1_v2"
+    },
+    "userName": {
+      "type": "string",
+      "defaultValue": "azureuser"
+    },
+    "password": {
+      "type": "securestring"
+    }
+  },
+  "variables": {
+    "labName": "[concat(parameters('prefix'), '-lab')]",
+    "vnetName": "[concat(variables('labName'), '-vnet')]",
+    "labSubnetName": "[concat(variables('vnetName'), 'Subnet')]",
+    "labVirtualNetworkId": "[resourceId('Microsoft.DevTestLab/labs/virtualnetworks', variables('labName'), variables('vnetName'))]",
+    "vmId": "[resourceId ('Microsoft.DevTestLab/labs/virtualmachines', variables('labName'), parameters('vmName'))]",
+    "vmName": "[concat(variables('labName'), '/', parameters('vmName'))]"
+  },
+  "resources": [{
+      "name": "[variables('labName')]",
+      "type": "Microsoft.DevTestLab/labs",
+      "apiVersion": "2017-04-26-preview",
+      "location": "[resourceGroup().location]",
+      "resources": [{
+        "apiVersion": "2017-04-26-preview",
+        "name": "[variables('vnetName')]",
+        "type": "virtualNetworks",
+        "dependsOn": [
+          "[resourceId('Microsoft.DevTestLab/labs', variables('labName'))]"
+        ]
+      }]
+    },
+    {
+      "name": "[variables('vmName')]",
+      "type": "Microsoft.DevTestLab/labs/virtualmachines",
+      "apiVersion": "2017-04-26-preview",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[variables('labVirtualNetworkId')]"
+      ],
+      "properties": {
+        "galleryImageReference": {
+          "offer": "VisualStudio",
+          "publisher": "MicrosoftVisualStudio",
+          "sku": "VS-2017-Ent-Latest-Win10-N",
+          "osType": "Windows",
+          "version": "latest"
+        },
+        "size": "[parameters('vmSize')]",
+        "storageType": "Premium",
+        "isAuthenticationWithSshKey": false,
+        "sshKey": "",
+        "userName": "[parameters('userName')]",
+        "password": "[parameters('password')]",
+        "labVirtualNetworkId": "[variables('labVirtualNetworkId')]",
+        "labSubnetName": "[variables('labSubnetName')]",
+        "notes": "Visual Studio Enterprise 2017 (latest release) on Windows 10 Enterprise N (x64)",
+        "artifacts": [{
+            "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', variables('labName'), 'public repo', 'windows-vscode')]"
+          },
+          {
+            "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', variables('labName'), 'public repo', 'windows-git')]"
+          },
+          {
+            "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', variables('labName'), 'public repo', 'windows-chrome')]"
+          }
+        ],
+        "disallowPublicIpAddress": true,
+        "allowClaim": false,
+        "networkInterface": {
+          "sharedPublicIpAddressConfiguration": {
+            "inboundNatRules": [{
+              "transportProtocol": "tcp",
+              "backendPort": 3389
+            }]
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "lab": {
+      "type": "object",
+      "value": {
+        "id": "[resourceId('Microsoft.DevTestLab/labs', variables('labName'))]"
+      }
+    },
+    "labVM": {
+      "type": "object",
+      "value": {
+        "id": "[variables('vmId')]"
+      }
+    }
+  }
+}

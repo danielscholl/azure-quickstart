@@ -1,0 +1,36 @@
+{
+  "name": "azure-quickstarts",
+  "version": "1.0.0",
+  "description": "Quick Start ARM Templates",
+  "config": {
+    "prefix": "my"
+  },
+  "devDependencies": {
+    "should": "^13.1.0",
+    "tap": "^10.7.2",
+    "uuid": "^3.1.0",
+    "watch": "^1.0.2"
+  },
+  "scripts": {
+    "test": "tap tests/*.spec.js  --reporter spec",
+    "test-template": "tap tests/template.spec.js  --reporter spec",
+    "test-reporter": "tap tests/*.spec.js --reporter xunit --output-file .test-output/raw.txt > .test-output/results.xml",
+    "start": "watch 'clear && npm run -s test-template' .",
+    "sync": "npm run sync:runbooks && npm run sync:dsc",
+    "sync:runbooks": "./scripts/sync.sh $npm_package_config_prefix-automation runbooks",
+    "sync:dsc": "./scripts/sync.sh $npm_package_config_prefix-automation dsc",
+    "group": "npm run group:common && npm run group:automation && npm run group:iaas",
+    "group:common": "az group create --location southcentralus --name $npm_package_config_prefix-common",
+    "group:automation": "az group create --location southcentralus --name $npm_package_config_prefix-automation",
+    "group:iaas": "az group create --location southcentralus --name $npm_package_config_prefix-iaas",
+    "provision:storage": "az group deployment create --template-file iac-storage/azuredeploy.json --parameters iac-storage/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-common",
+    "provision:keyvault": "az group deployment create --template-file iac-keyvault/azuredeploy.json --parameters iac-keyvault/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-common",
+    "provision:network": "az group deployment create --template-file iac-network/azuredeploy.json --parameters iac-network/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-common",
+    "provision:functions": "az group deployment create --template-file iac-functions/azuredeploy.json --parameters iac-functions/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-automation",
+    "provision:automation": "./iac-automation/install.sh $npm_package_config_prefix-automation $npm_package_config_prefix-common",
+    "provision:publicVM": "./iac-publicVM/install.sh $npm_package_config_prefix-iaas $npm_package_config_prefix-iaas",
+    "provision:devtestlab": "az group deployment create --template-file iac-functions/azuredeploy.json --parameters iac-functions/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-automation"
+  },
+  "author": "",
+  "license": "MIT"
+}
