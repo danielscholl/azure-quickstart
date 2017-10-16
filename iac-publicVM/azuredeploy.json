@@ -35,18 +35,6 @@
         "description": "Subnet ID to associate VM to."
       }
     },
-    "keyVaultGroup": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the existing KeyVault Resource Group"
-      }
-    },
-    "keyVaultName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the Key Vault that holds Credential Information"
-      }
-    },
     "WindowsOSVersion": {
       "type": "string",
       "metadata": {
@@ -66,6 +54,12 @@
       "type": "string",
       "metadata": {
         "description": "Storage Account Name for Diagnostic Logs"
+      }
+    },
+    "storageAccountKey": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Account Key for Diagnostic Logs"
       }
     },
     "remoteAccessACL": {
@@ -92,7 +86,6 @@
     "NicName": "[concat(parameters('vmName'), '-nic')]",
     "vnetID": "[resourceId(parameters('vnetGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnet'))]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('subnet'))]",
-    "KeyVaultId": "[resourceId(parameters('keyVaultGroup'), 'Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
     "NsgName": "[concat(parameters('vmName'), '-nsg')]",
     "NsgId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NsgName'))]",
     "PublicIpName": "[concat(parameters('vmName'), '-ip')]",
@@ -264,15 +257,7 @@
             },
             "protectedSettings": {
               "storageAccountName": "[parameters('storageAccountName')]",
-              "storageAccountKey": {
-                "reference": {
-                  "keyVault": {
-                    "id": "[variables('KeyVaultId')]"
-                  },
-                  "secretName": "diagPrimaryKey"
-                },
-                "storageAccountEndPoint": "https://core.windows.net"
-              }
+              "storageAccountKey": "[parameters('storageAccountKey')]"
             }
           }
         }

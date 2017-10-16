@@ -40,13 +40,10 @@ az account set --subscription ${AZURE_SUBSCRIPTION}
 ##############################
 tput setaf 2; echo "Gathering information for Diagnostics Storage Account..." ; tput sgr0
 STORAGE_ACCOUNT=$(GetStorageAccount $COMMON_GROUP)
+STORAGE_ACCOUNT_KEY=$(GetStorageAccountKey $COMMON_GROUP $STORAGE_ACCOUNT)
 
-tput setaf 2; echo "Gathering information for KeyVault..." ; tput sgr0
-KEY_VAULT=$(GetKeyVault $COMMON_GROUP)
-
-PARAMS="storageAccountName=$STORAGE_ACCOUNT keyVaultName=$KEY_VAULT"
+PARAMS="storageAccountName=$STORAGE_ACCOUNT storageAccountKey=$STORAGE_ACCOUNT_KEY"
 echo $PARAMS
-
 
 if [ -d ./scripts ]; then BASE_DIR=$PWD; else BASE_DIR=$(dirname $PWD); fi
 

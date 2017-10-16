@@ -13,6 +13,9 @@
     },
     "keyVaultGroup": {
       "value": "my-common"
+    },
+    "vmSize": {
+      "value": "Standard_A1"
     }
   }
 }
