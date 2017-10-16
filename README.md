@@ -43,6 +43,16 @@ Common Network is a 4 Subnet Network
 npm run provision:network
 ```
 
+## Provision Azure AD Domain Services
+Azure Active Directory Domain Services is used for Domain Authentication of Servers.  This is a manual step as ADDS for ARM
+is a relatively new feature and is still in Preview.
+
+In my-common resource group add Azure AD Domain Services.  (Requires Admin Access to Azure Active Directory)
+
+Once ADDS is provisioned (about 35 minutes) then you must configure DNS server settings for your virtual network. In your ADDS instance
+click the configure DNS Servers button and add the two DNS server IP's as Custom DNS Servers in the VNET.
+
+
 ## Provision Function App
 Automation Functions provides a Nested Template for GUID Creations
 
