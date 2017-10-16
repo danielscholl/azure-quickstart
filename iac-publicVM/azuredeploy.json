@@ -82,7 +82,7 @@
       }
     },
     "adminPassword": {
-      "type": "string",
+      "type": "securestring",
       "metadata": {
         "description": "Local Machine Admin User Password"
       }
@@ -269,7 +269,7 @@
                   "keyVault": {
                     "id": "[variables('KeyVaultId')]"
                   },
-                  "secretName": "[concat(parameters('storageAccountName'), '-key1')]"
+                  "secretName": "diagPrimaryKey"
                 },
                 "storageAccountEndPoint": "https://core.windows.net"
               }

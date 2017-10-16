@@ -22,7 +22,7 @@ if [ -z $RESOURCE_GROUP ]; then
   usage;
 fi
 
-if [ ! -z $1 ]; then COMMON_GROUP=$2; fi
+if [ ! -z $2 ]; then COMMON_GROUP=$2; fi
 if [ -z $COMMON_GROUP ]; then
   tput setaf 1; echo 'ERROR: COMMON_GROUP not provided' ; tput sgr0
   usage;
@@ -43,7 +43,6 @@ STORAGE_ACCOUNT=$(GetStorageAccount $COMMON_GROUP)
 
 tput setaf 2; echo "Gathering information for KeyVault..." ; tput sgr0
 KEY_VAULT=$(GetKeyVault $COMMON_GROUP)
-
 
 PARAMS="storageAccountName=$STORAGE_ACCOUNT keyVaultName=$KEY_VAULT"
 echo $PARAMS

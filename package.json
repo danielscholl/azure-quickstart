@@ -28,7 +28,7 @@
     "provision:network": "az group deployment create --template-file iac-network/azuredeploy.json --parameters iac-network/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-common",
     "provision:functions": "az group deployment create --template-file iac-functions/azuredeploy.json --parameters iac-functions/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-automation",
     "provision:automation": "./iac-automation/install.sh $npm_package_config_prefix-automation $npm_package_config_prefix-automation",
-    "provision:publicVM": "./iac-publicVM/install.sh $npm_package_config_prefix-iaas $npm_package_config_prefix-iaas",
+    "provision:publicVM": "./iac-publicVM/install.sh $npm_package_config_prefix-iaas $npm_package_config_prefix-common",
     "provision:devtestlab": "az group deployment create --template-file iac-functions/azuredeploy.json --parameters iac-functions/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-automation"
   },
   "author": "",
