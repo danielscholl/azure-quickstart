@@ -74,3 +74,17 @@ Required Attribute is the default login and password for local machine login to 
 ```bash
 npm run provision:automation
 ```
+
+## Provision Public Facing Jump Server
+JumpServer is deployed with 3 extensions.
+
+1. BGInfo
+2. Diagnostics
+3. OMS Agent
+
+
+To get the OMS Workspace Id and Key the portal must be used.
+
+1. Go to the Microsoft Operations Management Suite
+  - Connected Sources
+  - Windows Servers

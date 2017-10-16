@@ -62,6 +62,18 @@
         "description": "Storage Account Key for Diagnostic Logs"
       }
     },
+    "omsId": {
+      "type": "string",
+      "metadata": {
+        "description": "OMS Workspace ID"
+      }
+    },
+    "omsKey": {
+      "type": "string",
+      "metadata": {
+        "description": "OMS Workspace Key"
+      }
+    },
     "remoteAccessACL": {
       "type": "string",
       "metadata": {
@@ -258,6 +270,30 @@
             "protectedSettings": {
               "storageAccountName": "[parameters('storageAccountName')]",
               "storageAccountKey": "[parameters('storageAccountKey')]"
+            }
+          }
+        },
+        {
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "name": "[concat(parameters('vmName'), copyIndex(), '/OMSExtension')]",
+          "apiVersion": "2016-04-30-preview",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "virtualMachineLoop"
+          ],
+          "tags": {
+            "displayName": "OMSExtension"
+          },
+          "properties": {
+            "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+            "type": "MicrosoftMonitoringAgent",
+            "typeHandlerVersion": "1.0",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "workspaceId": "[parameters('omsId')]"
+            },
+            "protectedSettings": {
+              "workspaceKey": "[parameters('omsKey')]"
             }
           }
         }
