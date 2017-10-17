@@ -80,6 +80,12 @@
       "metadata": {
         "description": "Diagnostics Storage Account Name"
       }
+    },
+    "diagnosticsStorageKey": {
+      "type": "string",
+      "metadata": {
+        "description": "Diagnostics Storage Account Key"
+      }
     }
   },
   "variables": {
