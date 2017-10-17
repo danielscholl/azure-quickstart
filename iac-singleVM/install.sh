@@ -42,7 +42,7 @@ tput setaf 2; echo "Gathering information for Diagnostics Storage Account..." ; 
 STORAGE_ACCOUNT=$(GetStorageAccount $COMMON_GROUP)
 STORAGE_ACCOUNT_KEY=$(GetStorageAccountKey $COMMON_GROUP $STORAGE_ACCOUNT)
 
-PARAMS="storageAccountName=$STORAGE_ACCOUNT storageAccountKey=$STORAGE_ACCOUNT_KEY"
+PARAMS="diagnosticsStorageName=$STORAGE_ACCOUNT diagnosticsStorageKey=$STORAGE_ACCOUNT_KEY"
 echo $PARAMS
 
 if [ -d ./scripts ]; then BASE_DIR=$PWD; else BASE_DIR=$(dirname $PWD); fi

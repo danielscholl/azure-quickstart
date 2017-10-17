@@ -212,7 +212,7 @@
         },
         "protectedSettings": {
           "storageAccountName": "[parameters('diagnosticsStorageName')]",
-          "storageAccountKey": "[listKeys(variables('storageAccountId'),'2015-06-15').key1]",
+          "storageAccountKey": "[parameters('diagnosticsStorageKey')]",
           "storageAccountEndPoint": "https://core.windows.net"
         }
       }
