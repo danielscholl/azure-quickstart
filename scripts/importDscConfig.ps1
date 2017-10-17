@@ -17,13 +17,14 @@ Param(
   [Parameter(Mandatory = $true)]
   [string] $ResourceGroup,
 
-  [string] $AutomationAccount = $ResourceGroup.Replace("-", "").ToLower() + "-automate",
-  [string] $DscPath = "../dsc/",
+  [string] $DscPath = "./automation/dsc/",
   [string] $dscDataConfig = $dscRole + "-config.ps1",
   [bool] $Force = $false
 )
 
-function Import-DscConfiguration ($script, $config, $AutomationAccount, $ResourceGroup) {
+function Import-DscConfiguration ($script, $config, $ResourceGroup) {
+
+  $AutomationAccount = (Get-AzureRmAutomationAccount -ResourceGroupName $ResourceGroup).AutomationAccountName
 
   $dscConfig = Join-Path $DscPath ($script + ".ps1")
   $dscDataConfig = Join-Path $DscPath $config
@@ -75,4 +76,4 @@ function Import-DscConfiguration ($script, $config, $AutomationAccount, $Resourc
 }
 
 
-Import-DscConfiguration $dscRole $dscDataConfig $AutomationAccount $ResourceGroup
+Import-DscConfiguration $dscRole $dscDataConfig $ResourceGroup

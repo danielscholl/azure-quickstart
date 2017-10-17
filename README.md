@@ -14,10 +14,23 @@ npm run group
 ```
 
 ## Provision Common Storage 
-Common Storage is used for diagnostics collection
+Common Storage is used for diagnostics collection as well as template storage
 
 ```bash
 npm run provision:storage
+```
+
+Upload the templates into the storage container to allow for nested templates.
+
+```powershell
+.\scripts\createContainer.ps1 -ResourceGroupName my-common -ContainerName templates
+
+.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-storage -BlobName deployStorage.json
+.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-keyvault -BlobName deployKeyVault.json
+.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-network -BlobName deployNetwork.json
+.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-functions -BlobName deployFunctions.json
+.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-automation -BlobName deployAutomation.json
+.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-storage -BlobName deployPublicVM.json
 ```
 
 ## Provision Common KeyVault
@@ -73,6 +86,12 @@ Required Attribute is the default login and password for local machine login to 
 
 ```bash
 npm run provision:automation
+```
+
+To upload additional DSC Configurations execut the importDscConfig.ps1 script and supply the required attributes.
+
+```powershell
+.\scripts\importDscConfig.ps1 -ResourceGroup my-automation -dscRole DomainController
 ```
 
 ## Provision Public Facing Jump Server

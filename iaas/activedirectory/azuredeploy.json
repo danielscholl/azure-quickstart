@@ -1,0 +1,128 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "prefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Small unique string."
+      },
+      "minLength": 2,
+      "maxLength": 5
+    },
+    "_templateUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "Location of Nested Templates"
+      }
+    },
+    "vmName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for the Domain Controller VM."
+      },
+      "defaultValue": "ad"
+    },
+    "vmSuffix": {
+      "type": "string",
+      "metadata": {
+        "description": "Suffix Name for the Domain Controller VM."
+      },
+      "defaultValue": "0"
+    },
+    "vnetGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing VNET resource group"
+      }
+    },
+    "vnet": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing VNET"
+      }
+    },
+    "subnet": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the subnet in the virtual network you want to use"
+      }
+    },
+    "keyVaultGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing KeyVault Resource Group"
+      }
+    },
+    "keyVault": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Key Vault that holds Credential Information"
+      }
+    },
+    "diagStorage": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Account Name for Diagnostic Logs"
+      }
+    }
+  },
+  "variables": {
+    "KeyVaultId": "[resourceId(parameters('keyVaultGroup'), 'Microsoft.KeyVault/vaults', parameters('keyVault'))]",
+    "vmFullName": "[concat(parameters('prefix'), '-', parameters('vmName'), parameters('vmSuffix'))]"
+  },
+  "resources": [{
+    "name": "TemplateADServer",
+    "type": "Microsoft.Resources/deployments",
+    "apiVersion": "2015-01-01",
+    "dependsOn": [],
+    "properties": {
+      "mode": "Incremental",
+      "templateLink": {
+        "uri": "[concat(parameters('_templateUrl'), 'deploySingleVMDataDisk.json')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "parameters": {
+        "vnet": {
+          "value": "[parameters('vnet')]"
+        },
+        "vnetGroup": {
+          "value": "[parameters('vnetGroup')]"
+        },
+        "subnet": {
+          "value": "[parameters('subnet')]"
+        },
+        "vmName": {
+          "value": "[variables('vmFullName')]"
+        },
+        "adminUserName": {
+          "reference": {
+            "keyVault": {
+              "id": "[variables('KeyVaultId')]"
+            },
+            "secretName": "adminUserName"
+          }
+        },
+        "adminPassword": {
+          "reference": {
+            "keyVault": {
+              "id": "[variables('KeyVaultId')]"
+            },
+            "secretName": "adminPassword"
+          }
+        },
+        "storageName": {
+          "value": "[parameters('diagStorage')]"
+        },
+        "storageKey": {
+          "reference": {
+            "keyVault": {
+              "id": "[variables('KeyVaultId')]"
+            },
+            "secretName": "diagStorageKey"
+          }
+        }
+      }
+    }
+  }]
+}
