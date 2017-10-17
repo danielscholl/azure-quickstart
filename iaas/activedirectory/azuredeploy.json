@@ -123,10 +123,10 @@
             "secretName": "adminPassword"
           }
         },
-        "storageName": {
+        "diagnosticsStorageName": {
           "value": "[parameters('diagStorage')]"
         },
-        "storageKey": {
+        "diagnosticsStorageKey": {
           "reference": {
             "keyVault": {
               "id": "[variables('KeyVaultId')]"

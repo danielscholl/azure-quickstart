@@ -62,18 +62,20 @@ echo $TOKEN
 
 tput setaf 2; echo "Gathering information for Key Vault..." ; tput sgr0
 KEY_VAULT=$(GetKeyVault $COMMON_GROUP)
+echo $KEY_VAULT
 
 tput setaf 2; echo "Gathering information for Network..." ; tput sgr0
 NETWORK=$(GetNetwork $COMMON_GROUP)
+echo $NETWORK
 
 
 if [ -d ./scripts ]; then BASE_DIR=$PWD; else BASE_DIR=$(dirname $PWD); fi
 
 az group deployment create \
   --template-file $BASE_DIR/iaas/activedirectory/azuredeploy.json \
-  --parameters $BASE_DIR/iaas/activedirectory/singleVM/azuredeploy.parameters.json \
+  --parameters $BASE_DIR/iaas/activedirectory/azuredeploy.parameters.json \
   --parameters diagStorage=$STORAGE_ACCOUNT  \
-  --parameters keyVault=$COMMON_GROUP keyVault=$KEY_VAULT \
+  --parameters keyVaultGroup=$COMMON_GROUP keyVault=$KEY_VAULT \
   --parameters vnetGroup=$COMMON_GROUP vnet=$NETWORK \
-  --parameters sasToken=?$TOKEN \
+  --parameters templateStorage=$STORAGE_ACCOUNT sasToken=?$TOKEN \
   --resource-group $RESOURCE_GROUP
