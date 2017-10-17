@@ -84,57 +84,94 @@
     "templateURL": "[concat('https://', parameters('templateStorage'), '.blob.core.windows.net/', parameters('templateContainer'))]"
   },
   "resources": [{
-    "name": "TemplateADServer",
-    "type": "Microsoft.Resources/deployments",
-    "apiVersion": "2015-01-01",
-    "dependsOn": [],
-    "properties": {
-      "mode": "Incremental",
-      "templateLink": {
-        "uri": "[concat(variables('templateURL'), '/deploySingleVM.json', parameters('sasToken'))]",
-        "contentVersion": "1.0.0.0"
-      },
-      "parameters": {
-        "vnet": {
-          "value": "[parameters('vnet')]"
+      "name": "TemplateADServer",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateURL'), '/deploySingleVM.json', parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
         },
-        "vnetGroup": {
-          "value": "[parameters('vnetGroup')]"
-        },
-        "subnet": {
-          "value": "[parameters('subnet')]"
-        },
-        "vmName": {
-          "value": "[variables('vmFullName')]"
-        },
-        "adminUserName": {
-          "reference": {
-            "keyVault": {
-              "id": "[variables('KeyVaultId')]"
-            },
-            "secretName": "adminUserName"
+        "parameters": {
+          "vnet": {
+            "value": "[parameters('vnet')]"
+          },
+          "vnetGroup": {
+            "value": "[parameters('vnetGroup')]"
+          },
+          "subnet": {
+            "value": "[parameters('subnet')]"
+          },
+          "vmName": {
+            "value": "[variables('vmFullName')]"
+          },
+          "adminUserName": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "adminUserName"
+            }
+          },
+          "adminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "adminPassword"
+            }
+          },
+          "diagnosticsStorageName": {
+            "value": "[parameters('diagStorage')]"
+          },
+          "diagnosticsStorageKey": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "diagPrimaryKey"
+            }
           }
+        }
+      }
+    },
+    {
+      "name": "TemplateOMSMonitor",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "TemplateADServer"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateURL'), '/deployOMSExtension.json', parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
         },
-        "adminPassword": {
-          "reference": {
-            "keyVault": {
-              "id": "[variables('KeyVaultId')]"
-            },
-            "secretName": "adminPassword"
-          }
-        },
-        "diagnosticsStorageName": {
-          "value": "[parameters('diagStorage')]"
-        },
-        "diagnosticsStorageKey": {
-          "reference": {
-            "keyVault": {
-              "id": "[variables('KeyVaultId')]"
-            },
-            "secretName": "diagPrimaryKey"
+        "parameters": {
+          "vmName": {
+            "value": "[parameters('vmName')]"
+          },
+          "omsId": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "omsId"
+            }
+          },
+          "omsKey": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "omsKey"
+            }
           }
         }
       }
     }
-  }]
+  ]
 }
