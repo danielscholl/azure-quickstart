@@ -152,7 +152,7 @@
         },
         "parameters": {
           "vmName": {
-            "value": "[parameters('vmName')]"
+            "value": "[variables('vmFullName')]"
           },
           "omsId": {
             "reference": {
