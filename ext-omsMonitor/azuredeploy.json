@@ -1,0 +1,48 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing VM to apply the DSC configuration to"
+      }
+    },
+    "omsId": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Registration key to use to onboard to the Azure Automation DSC pull/reporting server"
+      }
+    },
+    "omsKey": {
+      "type": "string",
+      "metadata": {
+        "description": "Registration url of the Azure Automation DSC pull/reporting server"
+      }
+    }
+  },
+  "variables": {},
+  "resources": [{
+    "comments": "## OMS Extension ##",
+    "type": "Microsoft.Compute/virtualMachines/extensions",
+    "name": "[concat(parameters('vmName'),  '/OMSExtension')]",
+    "apiVersion": "2016-04-30-preview",
+    "location": "[resourceGroup().location]",
+    "dependsOn": [],
+    "tags": {
+      "displayName": "OMSExtension"
+    },
+    "properties": {
+      "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+      "type": "MicrosoftMonitoringAgent",
+      "typeHandlerVersion": "1.0",
+      "autoUpgradeMinorVersion": true,
+      "settings": {
+        "workspaceId": "[parameters('omsId')]"
+      },
+      "protectedSettings": {
+        "workspaceKey": "[parameters('omsKey')]"
+      }
+    }
+  }]
+}
