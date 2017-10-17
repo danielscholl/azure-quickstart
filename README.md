@@ -30,7 +30,8 @@ Upload the templates into the storage container to allow for nested templates.
 .\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-network -BlobName deployNetwork.json
 .\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-functions -BlobName deployFunctions.json
 .\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-automation -BlobName deployAutomation.json
-.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-storage -BlobName deployPublicVM.json
+.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-singleVM -BlobName deploySingleVM.json
+.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-publicVM -BlobName deployPublicVM.json
 ```
 
 ## Provision Common KeyVault

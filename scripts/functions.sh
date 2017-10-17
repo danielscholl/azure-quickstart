@@ -24,6 +24,17 @@ function CreateResourceGroup() {
       tput setaf 3;  echo "Resource Group $1 already exists."; tput sgr0
     fi
 }
+function GetNetwork() {
+  # Required Argument $1 = RESOURCE_GROUP
+
+  if [ -z $1 ]; then
+    tput setaf 1; echo 'ERROR: Argument $1 (RESOURCE_GROUP) not received' ; tput sgr0
+    exit 1;
+  fi
+
+  local _network=$(az network vnet list --resource-group $1 --query [].name -otsv)
+  echo ${_network}
+}
 function GetKeyVault() {
   # Required Argument $1 = RESOURCE_GROUP
 

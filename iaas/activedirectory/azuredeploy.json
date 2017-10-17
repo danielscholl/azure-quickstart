@@ -10,11 +10,8 @@
       "minLength": 2,
       "maxLength": 5
     },
-    "_templateUrl": {
-      "type": "string",
-      "metadata": {
-        "description": "Location of Nested Templates"
-      }
+    "sasToken": {
+      "type": "string"
     },
     "vmName": {
       "type": "string",
@@ -65,11 +62,26 @@
       "metadata": {
         "description": "Storage Account Name for Diagnostic Logs"
       }
+    },
+    "templateStorage": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Account Name hosting templates"
+      }
+    },
+    "templateContainer": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Account Container hosting templates"
+      },
+      "defaultValue": "templates"
     }
+
   },
   "variables": {
     "KeyVaultId": "[resourceId(parameters('keyVaultGroup'), 'Microsoft.KeyVault/vaults', parameters('keyVault'))]",
-    "vmFullName": "[concat(parameters('prefix'), '-', parameters('vmName'), parameters('vmSuffix'))]"
+    "vmFullName": "[concat(parameters('prefix'), '-', parameters('vmName'), parameters('vmSuffix'))]",
+    "templateURL": "[concat('https://', parameters('templateStorage'), '.blob.core.windows.net/', parameters('templateContainer'))]"
   },
   "resources": [{
     "name": "TemplateADServer",
@@ -79,7 +91,7 @@
     "properties": {
       "mode": "Incremental",
       "templateLink": {
-        "uri": "[concat(parameters('_templateUrl'), 'deploySingleVMDataDisk.json')]",
+        "uri": "[concat(variables('templateURL'), '/deploySingleVM.json', parameters('sasToken'))]",
         "contentVersion": "1.0.0.0"
       },
       "parameters": {
@@ -119,7 +131,7 @@
             "keyVault": {
               "id": "[variables('KeyVaultId')]"
             },
-            "secretName": "diagStorageKey"
+            "secretName": "diagPrimaryKey"
           }
         }
       }
