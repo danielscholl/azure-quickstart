@@ -11,7 +11,10 @@
       "maxLength": 5
     },
     "sasToken": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "Storage Access Token to retrieve private files from storage accounts."
+      }
     },
     "vmName": {
       "type": "string",
@@ -19,6 +22,13 @@
         "description": "Name for the Domain Controller VM."
       },
       "defaultValue": "ad"
+    },
+    "vmSize": {
+      "type": "string",
+      "metadata": {
+        "description": "The virtual machine server size."
+      },
+      "defaultValue": "Standard_A2"
     },
     "vmSuffix": {
       "type": "string",
@@ -75,13 +85,34 @@
         "description": "Storage Account Container hosting templates"
       },
       "defaultValue": "templates"
+    },
+    "dscNodeConfiguration": {
+      "type": "string",
+      "metadata": {
+        "description": "DSC Node Configuration"
+      },
+      "allowedValues": [
+        "DomainController"
+      ],
+      "defaultValue": "DomainController"
+    },
+    "domainType": {
+      "type": "string",
+      "metadata": {
+        "description": "Is it the first domain controller (new domain/forest) or will you be adding one?"
+      },
+      "allowedValues": [
+        "FirstDC",
+        "AdditionalDC"
+      ],
+      "defaultValue": "FirstDC"
     }
-
   },
   "variables": {
     "KeyVaultId": "[resourceId(parameters('keyVaultGroup'), 'Microsoft.KeyVault/vaults', parameters('keyVault'))]",
     "vmFullName": "[concat(parameters('prefix'), '-', parameters('vmName'), parameters('vmSuffix'))]",
-    "templateURL": "[concat('https://', parameters('templateStorage'), '.blob.core.windows.net/', parameters('templateContainer'))]"
+    "templateURL": "[concat('https://', parameters('templateStorage'), '.blob.core.windows.net/', parameters('templateContainer'))]",
+    "DomainController": "[concat(parameters('dscNodeConfiguration'), '.', parameters('domainType'))]"
   },
   "resources": [{
       "name": "TemplateADServer",
@@ -106,6 +137,9 @@
           },
           "vmName": {
             "value": "[variables('vmFullName')]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
           },
           "adminUserName": {
             "reference": {
@@ -169,6 +203,35 @@
               },
               "secretName": "omsKey"
             }
+          }
+        }
+      }
+    },
+    {
+      "name": "templateDSCExtension",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "TemplateADServer"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateURL'), '/deployDSCExtension.json', parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[variables('vmFullName')]"
+          },
+          "registrationUrl": {
+            "value": "https://scus-agentservice-prod-1.azure-automation.net/accounts/776b8b78-9042-41d5-bb4c-c42dfb2a2ffd"
+          },
+          "registrationKey": {
+            "value": "hcKcFWuozoAWjZRrumq1GN7csu0rEx/2xCz3zQDVU86N3Vb/ATvqU2S40LhG5BdDshayYsYNGk7K1ZCNuGoF9g=="
+          },
+          "nodeConfigurationName": {
+            "value": "[variables('DomainController')]"
           }
         }
       }

@@ -1,0 +1,193 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "prefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Small unique string."
+      },
+      "defaultValue": "my",
+      "minLength": 2,
+      "maxLength": 5
+    },
+    "sasToken": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Access Token to retrieve private files from storage accounts."
+      }
+    },
+    "vmName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for the VM."
+      },
+      "defaultValue": "jumpbox"
+    },
+    "vmSize": {
+      "type": "string",
+      "metadata": {
+        "description": "The virtual machine server size."
+      },
+      "defaultValue": "Standard_A2"
+    },
+    "vnet": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing VNET"
+      }
+    },
+    "vnetGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing VNET resource group"
+      }
+    },
+    "subnet": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the subnet in the virtual network you want to use"
+      }
+    },
+    "keyVault": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Key Vault that holds Credential Information"
+      }
+    },
+    "keyVaultGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing KeyVault Resource Group"
+      }
+    },
+    "diagStorage": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Account Name for Diagnostic Logs"
+      }
+    },
+    "templateStorage": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Account Name hosting templates"
+      }
+    },
+    "templateContainer": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Account Container hosting templates"
+      },
+      "defaultValue": "templates"
+    },
+    "remoteAccessACL": {
+      "type": "string",
+      "metadata": {
+        "description": "Remote Access CIDR"
+      },
+      "defaultValue": "Internet"
+    }
+  },
+  "variables": {
+    "KeyVaultId": "[resourceId(parameters('keyVaultGroup'), 'Microsoft.KeyVault/vaults', parameters('keyVault'))]",
+    "vmFullName": "[concat(parameters('prefix'), '-', parameters('vmName'))]",
+    "templateURL": "[concat('https://', parameters('templateStorage'), '.blob.core.windows.net/', parameters('templateContainer'))]"
+  },
+  "resources": [{
+      "name": "TemplateJumpServer",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateURL'), '/deployPublicVM.json', parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vnetGroup": {
+            "value": "[parameters('vnetGroup')]"
+          },
+          "vnet": {
+            "value": "[parameters('vnet')]"
+          },
+          "subnet": {
+            "value": "[parameters('subnet')]"
+          },
+          "vmName": {
+            "value": "[variables('vmFullName')]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          },
+          "remoteAccessACL": {
+            "value": "[parameters('remoteAccessACL')]"
+          },
+          "username": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "adminUserName"
+            }
+          },
+          "password": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "adminPassword"
+            }
+          },
+          "storageAccountName": {
+            "value": "[parameters('diagStorage')]"
+          },
+          "storageAccountKey": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "diagPrimaryKey"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "TemplateOMSMonitor",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "TemplateJumpServer"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateURL'), '/deployOMSExtension.json', parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[variables('vmFullName')]"
+          },
+          "omsId": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "omsId"
+            }
+          },
+          "omsKey": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "omsKey"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
