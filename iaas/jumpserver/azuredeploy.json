@@ -29,7 +29,7 @@
       "metadata": {
         "description": "The virtual machine server size."
       },
-      "defaultValue": "Standard_A2"
+      "defaultValue": "Standard_D2_v2"
     },
     "vnet": {
       "type": "string",
@@ -185,6 +185,84 @@
               },
               "secretName": "omsKey"
             }
+          }
+        }
+      }
+    },
+    {
+      "name": "TemplateDomainJoin",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "TemplateJumpServer"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateURL'), '/deployDomainJoinExtension.json', parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[variables('vmFullName')]"
+          },
+          "username": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "adminUserName"
+            }
+          },
+          "password": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "adminPassword"
+            }
+          },
+          "domain": {
+            "value": "[concat(parameters('prefix'), '.local')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "templateDSCExtension",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "TemplateJumpServer"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateURL'), '/deployDSCExtension.json', parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[variables('vmFullName')]"
+          },
+          "registrationUrl": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "dscServerUrl"
+            }
+          },
+          "registrationKey": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "dscServerKey"
+            }
+          },
+          "nodeConfigurationName": {
+            "value": "DockerHost.ContainerHost"
           }
         }
       }

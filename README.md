@@ -34,6 +34,7 @@ Upload the templates into the storage container to allow for nested templates.
 .\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-publicVM -BlobName deployPublicVM.json
 .\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart ext-omsMonitor -BlobName deployOMSExtension.json
 .\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart ext-dscNode -BlobName deployDSCExtension.json
+.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart ext-domainJoin -BlobName deployDomainJoinExtension.json
 ```
 
 ## Provision Common KeyVault

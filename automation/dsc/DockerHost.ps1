@@ -1,4 +1,4 @@
-Configuration ContainerHostDsc
+Configuration DockerHost
 {
   Import-DscResource -ModuleName PSDesiredStateConfiguration
   Import-DscResource -ModuleName xPSDesiredStateConfiguration
@@ -8,12 +8,12 @@ Configuration ContainerHostDsc
   # Set up general parameters used to determine paths where Docker will
   # be installed to and downloaded from.
   $ProgramFiles = $ENV:ProgramFiles
-  $DockerPath = Join-Path -Path $ProgramFiles -ChildPath 'Docker'
+  $DockerPath = Join-Path -Path $ProgramFiles -ChildPath 'docker'
   $DockerZipFileName = 'docker.zip'
   $DockerZipPath = Join-Path -Path $ProgramFiles -ChildPath $DockerZipFilename
   $DockerUri = 'https://download.docker.com/win/static/stable/x86_64/docker-17.09.0-ce.zip'
 
-  Node $AllNodes.NodeName {
+  node ContainerHost {
 
     # Install containers feature
     WindowsFeature ContainerInstall {
@@ -86,7 +86,7 @@ Configuration ContainerHostDsc
       Name        = 'Docker'
       StartupType = 'Automatic'
       State       = 'Running'
-      DependsOn   = '[Script]DockerService'
+      # DependsOn   = '[Script]DockerService'
     }
   }
 }

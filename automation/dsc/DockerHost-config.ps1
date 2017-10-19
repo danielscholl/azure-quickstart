@@ -1,0 +1,7 @@
+$ConfigData = @{
+  AllNodes = @(
+    @{
+      NodeName = "ContainerHost"
+    }
+  )
+}
