@@ -1,7 +1,7 @@
 $ConfigData = @{
   AllNodes = @(
     @{
-      NodeName = "ContainerHost"
+      NodeName = "Server"
     }
   )
 }

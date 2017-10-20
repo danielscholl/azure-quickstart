@@ -13,7 +13,7 @@ Configuration DockerHost
   $DockerZipPath = Join-Path -Path $ProgramFiles -ChildPath $DockerZipFilename
   $DockerUri = 'https://download.docker.com/win/static/stable/x86_64/docker-17.09.0-ce.zip'
 
-  node ContainerHost {
+  node Server {
 
     # Install containers feature
     WindowsFeature ContainerInstall {
