@@ -74,6 +74,7 @@ Configuration DomainController {
     xADUser FirstUser
     {
       DomainName = $dscDomainName
+      DomainAdministratorCredential = $dscDomainAdmin
       UserName = $dscDomainAdmin.Username
       Password = $dscDomainAdmin
       PasswordNeverExpires = $true
