@@ -245,24 +245,17 @@
           "vmName": {
             "value": "[variables('vmFullName')]"
           },
+          "modulesUrl": {
+            "value": "[concat(variables('templateURL'), '/UpdateLCMforAAPull.zip', parameters('sasToken'))]",
+          },
           "registrationUrl": {
-            "reference": {
-              "keyVault": {
-                "id": "[variables('KeyVaultId')]"
-              },
-              "secretName": "dscServerUrl"
-            }
+            "value": "https://scus-agentservice-prod-1.azure-automation.net/accounts/776b8b78-9042-41d5-bb4c-c42dfb2a2ffd"
           },
           "registrationKey": {
-            "reference": {
-              "keyVault": {
-                "id": "[variables('KeyVaultId')]"
-              },
-              "secretName": "dscServerKey"
-            }
+            "value": "hcKcFWuozoAWjZRrumq1GN7csu0rEx/2xCz3zQDVU86N3Vb/ATvqU2S40LhG5BdDshayYsYNGk7K1ZCNuGoF9g=="
           },
           "nodeConfigurationName": {
-            "value": "Fontend.Web"
+            "value": "Frontend.Web"
           }
         }
       }
