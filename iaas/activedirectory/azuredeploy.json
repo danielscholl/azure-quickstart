@@ -224,6 +224,9 @@
           "vmName": {
             "value": "[variables('vmFullName')]"
           },
+          "modulesUrl": {
+            "value": "[concat(variables('templateURL'), '/UpdateLCMforAAPull.zip', parameters('sasToken'))]",
+          },
           "registrationUrl": {
             "value": "https://scus-agentservice-prod-1.azure-automation.net/accounts/776b8b78-9042-41d5-bb4c-c42dfb2a2ffd"
           },
