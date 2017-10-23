@@ -170,7 +170,12 @@ function CreateSASToken() {
     exit 1;
   fi
 
-  local _expire=$(date -d '+30 minutes' -u +%Y-%m-%dT%H:%MZ)
+  if [ $OSTYPE  == "darwin17.0.0" ]; then
+    local _expire=$(date -v+30M -u +%Y-%m-%dT%H:%MZ)
+  else
+    local _expire=$(date -d '+30 minutes' -u +%Y-%m-%dT%H:%MZ)
+  fi
+
   local _token=$(az storage container generate-sas --name $1 \
   --expiry ${_expire} \
   --permissions r \

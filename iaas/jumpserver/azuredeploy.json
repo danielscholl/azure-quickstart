@@ -255,7 +255,7 @@
             "value": "hcKcFWuozoAWjZRrumq1GN7csu0rEx/2xCz3zQDVU86N3Vb/ATvqU2S40LhG5BdDshayYsYNGk7K1ZCNuGoF9g=="
           },
           "nodeConfigurationName": {
-            "value": "Frontend.Web"
+            "value": "AppServer.ContainerHost"
           }
         }
       }
