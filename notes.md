@@ -25,7 +25,7 @@ Add-KdsRootKey -EffectiveTime ((get-date).addhours(-10));
 $AD_GROUP_NAME = "Container Hosts"
 $GROUP = Get-ADGroup -Identity $AD_GROUP_NAME -ErrorAction SilentlyContinue
 if (!$GROUP) {
-  $GROUP = New-ADGroup –name $AD_GROUP –groupscope Global
+  $GROUP = New-ADGroup –name $AD_GROUP_NAME –groupscope Global
 }
 ```
 
@@ -104,7 +104,7 @@ Test-AdServiceAccount -Identity $ACCOUNT_NAME
 ```powershell
 Invoke-WebRequest "https://raw.githubusercontent.com/Microsoft/Virtualization-Documentation/live/windows-server-container-tools/ServiceAccounts/CredentialSpec.psm1" -UseBasicParsing -OutFile $env:TEMP\cred.psm1
 Import-Module $env:temp\cred.psm1
-New-CredentialSpec -Name Gmsa -AccountName $ACCOUNT_NAME
+New-CredentialSpec -Name my-jumpbox -AccountName $ACCOUNT_NAME
 
 #This will return location and name of JSON file
 Get-CredentialSpec
@@ -115,10 +115,83 @@ Get-CredentialSpec
 
 ```powershell
 docker pull microsoft/windowsservercore
-docker run -it --security-opt "credentialspec=file://Gmsa.json" microsoft/windowsservercore nltest /parentdoamin
+docker run -it --security-opt "credentialspec=file://Gmsa.json" microsoft/windowsservercore nltest /parentdomain
 
-docker run -d -h containerhost --security-opt "credentialspec=file://Gmsa.json" -p 8888:80 artisticcheese/winauth:nano-iis
+docker run -d -h containerhost --security-opt "credentialspec=file://my-jumpbox.json" -p 8888:80 artisticcheese/winauth:nano-iis
 ```
+
+
+#### Set the SPN
+
+```powershell
+setspn -c -s HTTP/my-jumpbox my\my-jumpbox
+setspn -c -s HTTP/my-jumpbox.my.local my\my-jumpbox
+```
+
+#### Run the Container
+
+```powershell
+docker run -it --name infoApp -h my-jumpbox -p 8000:80 --security-opt "credentialspec=file://my-jumpbox.json" microsoft/winsowservercore:latest
+```
+
+
+# Manage IIS on a Container
+
+1. Start up a container with a dotnet-framework base.
+
+ `docker run -it --name IISServer -h my-jumpbox --security-opt "credentialspec=file://my-jumpbox.json" -v c:\shared:c:\shared microsoft/dotnet-framework:4.6.2 powershell`
+
+2. Install IIS + IIS Management
+
+`Install-WindowsFeature -name Web-Server -IncludeManagementTools`
+
+3. Install IIS Management Service
+
+`Dism /online /enable-feature /featurename:IIS-ManagementService /all`
+
+4. Enable Remote Access
+
+`New-ItemProperty -Path HKLM:\software\microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1 -Force`
+
+5. Install any desired Web Modules
+
+```powershell
+Import-Module Dism
+
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerRole
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServer
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-CommonHttpFeatures
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpErrors
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpRedirect
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ApplicationDevelopment
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-HealthAndDiagnostics
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpLogging
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-LoggingLibraries
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-RequestMonitor
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpTracing
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-Security
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-URLAuthorization
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-RequestFiltering
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-IPSecurity
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-Performance
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpCompressionDynamic
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerManagementTools
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-WindowsAuthentication
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-StaticContent
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-DefaultDocument
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ASPNET
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ASPNET45
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ASP
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ISAPIExtensions
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ISAPIFilter
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-CustomLogging
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-BasicAuthentication
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpCompressionStatic
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ManagementConsole
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ManagementService
+```
+
+
 
 
 
