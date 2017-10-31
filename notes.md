@@ -21,15 +21,28 @@ Add-KdsRootKey -EffectiveTime ((get-date).addhours(-10));
 
 #### Create a Global Security Group _"Container Hosts"_ 
 
+Right now I'm doing this manually as I don't know why the group doesn't show up in the UI when done via powershell.
+
 ```powershell
-$AD_GROUP_NAME = "Container Hosts"
+    New-ADGroup -Name "Docker Hosts" -GroupScope Global
+```
+
+```powershell
+$AD_GROUP_NAME = "Docker Hosts"
 $GROUP = Get-ADGroup -Identity $AD_GROUP_NAME -ErrorAction SilentlyContinue
 if (!$GROUP) {
-  $GROUP = New-ADGroup –name $AD_GROUP_NAME –groupscope Global
+  $GROUP = New-ADGroup –Name $AD_GROUP_NAME –groupscope Global
 }
 ```
 
 #### Create a GMSA account in Active Directory
+
+GMSA Name:  my\dockerhost
+Container Host:  my-jumpbox.my.local
+
+```powershell
+New-ADServiceAccount -Name dockerhost -DNSHostName dockerhost.my.local -PrincipalsAllowedToRetrieveManagedPassword "Domain Controllers", "domain admins", "CN=dockerhost,CN=Builtin,DC=my,DC=local" -KerberosEncryptionType RC4, AES128, AES256
+```
 
 _**This assumes an active directory domain called 'my.local'_
 ```powershell
@@ -139,7 +152,7 @@ docker run -it --name infoApp -h my-jumpbox -p 8000:80 --security-opt "credentia
 
 1. Start up a container with a dotnet-framework base.
 
- `docker run -it --name IISServer -h my-jumpbox --security-opt "credentialspec=file://my-jumpbox.json" -v c:\shared:c:\shared microsoft/dotnet-framework:4.6.2 powershell`
+ `docker run -it --name IISServer -h dockerhost --security-opt "credentialspec=file://dockerhost.json" -v c:\shared:c:\shared microsoft/dotnet-framework:4.6.2 powershell`
 
 2. Install IIS + IIS Management
 
@@ -191,7 +204,16 @@ Enable-WindowsOptionalFeature -Online -FeatureName IIS-ManagementConsole
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-ManagementService
 ```
 
+#### Startup Test Containers
 
+docker run --name IISTest -h dockerhost -p 8000:80 --security-opt "credentialspec=file://dockerhost.json" -d artisticcheese/winauth:servercore
+docker run --name nanoIIS -h dockerhost -p 8001:80 --security-opt "credentialspec=file://dockerhost.json" -d artisticcheese/winauth:nano-iis
+docker run --name nanoHTTP -h dockerhost -p 8002:80 --security-opt "credentialspec=file://dockerhost.json" -d artisticcheese/winauth:nano-httpsys
+
+
+Sites
+
+1. https://gist.github.com/PatrickLang/27c743782fca17b19bf94490cbb6f960
 
 
 

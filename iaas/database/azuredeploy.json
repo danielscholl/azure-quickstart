@@ -1,0 +1,231 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "prefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Small unique string."
+      },
+      "minLength": 2,
+      "maxLength": 5
+    },
+    "sasToken": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Access Token to retrieve private files from storage accounts."
+      }
+    },
+    "vmName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for the Database VM."
+      },
+      "defaultValue": "db"
+    },
+    "vmSize": {
+      "type": "string",
+      "metadata": {
+        "description": "The virtual machine server size."
+      },
+      "defaultValue": "Standard_DS1_v2"
+    },
+    "vmSuffix": {
+      "type": "string",
+      "metadata": {
+        "description": "Suffix Name for the Domain Controller VM."
+      },
+      "defaultValue": "0"
+    },
+    "vnetGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing VNET resource group"
+      }
+    },
+    "vnet": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing VNET"
+      }
+    },
+    "subnet": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the subnet in the virtual network you want to use"
+      }
+    },
+    "keyVaultGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing KeyVault Resource Group"
+      }
+    },
+    "keyVault": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Key Vault that holds Credential Information"
+      }
+    },
+    "diagStorage": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Account Name for Diagnostic Logs"
+      }
+    },
+    "templateStorage": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Account Name hosting templates"
+      }
+    },
+    "templateContainer": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage Account Container hosting templates"
+      },
+      "defaultValue": "templates"
+    },
+    "dscNodeConfiguration": {
+      "type": "string",
+      "metadata": {
+        "description": "DSC Node Configuration"
+      },
+      "allowedValues": [
+        "SqlServer.Standalone"
+      ],
+      "defaultValue": "SqlServer.Standalone"
+    }
+  },
+  "variables": {
+    "KeyVaultId": "[resourceId(parameters('keyVaultGroup'), 'Microsoft.KeyVault/vaults', parameters('keyVault'))]",
+    "vmFullName": "[concat(parameters('prefix'), '-', parameters('vmName'), parameters('vmSuffix'))]",
+    "templateURL": "[concat('https://', parameters('templateStorage'), '.blob.core.windows.net/', parameters('templateContainer'))]"
+  },
+  "resources": [{
+      "name": "TemplateDBServer",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateURL'), '/deployDatabaseVM.json', parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vnet": {
+            "value": "[parameters('vnet')]"
+          },
+          "vnetGroup": {
+            "value": "[parameters('vnetGroup')]"
+          },
+          "subnet": {
+            "value": "[parameters('subnet')]"
+          },
+          "vmName": {
+            "value": "[variables('vmFullName')]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          },
+          "adminUserName": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "adminUserName"
+            }
+          },
+          "adminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "adminPassword"
+            }
+          },
+          "diagnosticsStorageName": {
+            "value": "[parameters('diagStorage')]"
+          },
+          "diagnosticsStorageKey": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "diagPrimaryKey"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "TemplateOMSMonitor",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "TemplateDBServer"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateURL'), '/deployOMSExtension.json', parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[variables('vmFullName')]"
+          },
+          "omsId": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "omsId"
+            }
+          },
+          "omsKey": {
+            "reference": {
+              "keyVault": {
+                "id": "[variables('KeyVaultId')]"
+              },
+              "secretName": "omsKey"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "templateDSCExtension",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "TemplateDBServer"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateURL'), '/deployDSCExtension.json', parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[variables('vmFullName')]"
+          },
+          "modulesUrl": {
+            "value": "[concat(variables('templateURL'), '/UpdateLCMforAAPull.zip', parameters('sasToken'))]"
+          },
+          "registrationUrl": {
+            "value": "https://scus-agentservice-prod-1.azure-automation.net/accounts/776b8b78-9042-41d5-bb4c-c42dfb2a2ffd"
+          },
+          "registrationKey": {
+            "value": "hcKcFWuozoAWjZRrumq1GN7csu0rEx/2xCz3zQDVU86N3Vb/ATvqU2S40LhG5BdDshayYsYNGk7K1ZCNuGoF9g=="
+          },
+          "nodeConfigurationName": {
+            "value": "[parameters('dscNodeConfiguration')]"
+          }
+        }
+      }
+    }
+  ]
+}

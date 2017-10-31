@@ -1,0 +1,22 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "value": "vm"
+    },
+    "vmSize": {
+      "value": "Standard_DS1_v2"
+    },
+    "vnetGroup": {
+      "value": "my-common"
+    },
+    "vnet": {
+      "value": "my-vnet"
+    },
+    "subnet": {
+      "value": "front_subnet"
+    }
+
+  }
+}

@@ -7,36 +7,36 @@ Dism /online /enable-feature /featurename:IIS-ManagementService /all
 New-ItemProperty -Path HKLM:\software\microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1 -Force
 
 
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerRole
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServer
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-CommonHttpFeatures
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpErrors
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpRedirect
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-ApplicationDevelopment
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-NetFxExtensibility45
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-HealthAndDiagnostics
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpLogging
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-LoggingLibraries
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-RequestMonitor
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpTracing
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-Security
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-RequestFiltering
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-Performance
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerManagementTools
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-IIS6ManagementCompatibility
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-Metabase
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-ManagementConsole
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-BasicAuthentication
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-WindowsAuthentication
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-StaticContent
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-DefaultDocument
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebSockets
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-ApplicationInit
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-NetFxExtensibility45
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-ASPNET45
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-ISAPIExtensions
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-ISAPIFilter
-Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpCompressionStatic
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-WebServerRole
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-WebServer
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-CommonHttpFeatures
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-HttpErrors
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-HttpRedirect
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-ApplicationDevelopment
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-NetFxExtensibility45
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-HealthAndDiagnostics
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-HttpLogging
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-LoggingLibraries
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-RequestMonitor
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-HttpTracing
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-Security
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-RequestFiltering
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-Performance
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-WebServerManagementTools
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-IIS6ManagementCompatibility
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-Metabase
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-ManagementConsole
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-BasicAuthentication
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-WindowsAuthentication
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-StaticContent
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-DefaultDocument
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-WebSockets
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-ApplicationInit
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-NetFxExtensibility45
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-ASPNET45
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-ISAPIExtensions
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-ISAPIFilter
+Enable-WindowsOptionalFeature -Online -All -FeatureName IIS-HttpCompressionStatic
 
 net stop Iisadmin
 net stop W3svc

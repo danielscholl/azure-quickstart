@@ -33,7 +33,8 @@
     "provision:devtestlab": "az group deployment create --template-file iac-functions/azuredeploy.json --parameters iac-functions/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-automation",
     "provision:registry": "az group deployment create --template-file iac-container/azuredeploy.json --parameters iac-container/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-common",
     "provision:activedirectory": "./iaas/activedirectory/install.sh  $npm_package_config_prefix-iaas $npm_package_config_prefix-common templates",
-    "provision:jumpserver": "./iaas/jumpserver/install.sh  $npm_package_config_prefix-iaas $npm_package_config_prefix-common templates"
+    "provision:jumpserver": "./iaas/jumpserver/install.sh  $npm_package_config_prefix-iaas $npm_package_config_prefix-common templates",
+    "provision:database": "./iaas/database/install.sh  $npm_package_config_prefix-iaas $npm_package_config_prefix-common templates"
   },
   "author": "",
   "license": "MIT"

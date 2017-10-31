@@ -31,6 +31,7 @@ Upload the templates into the storage container to allow for nested templates.
 .\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-functions -BlobName deployFunctions.json
 .\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-automation -BlobName deployAutomation.json
 .\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-singleVM -BlobName deploySingleVM.json
+.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-databaseVM -BlobName deployDatabaseVM.json
 .\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-publicVM -BlobName deployPublicVM.json
 .\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart ext-omsMonitor -BlobName deployOMSExtension.json
 .\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart ext-dscNode -BlobName deployDSCExtension.json
@@ -95,6 +96,7 @@ To upload additional DSC Configurations execut the importDscConfig.ps1 script an
 
 ```powershell
 .\scripts\importDscConfig.ps1 -ResourceGroup my-automation -dscRole DomainController
+.\scripts\importDscConfig.ps1 -ResourceGroup my-automation -dscRole SqlServer
 ```
 
 Upload the Local Configuration Management file to configure a server to use the Automation Account as its DSC Pull Server.
