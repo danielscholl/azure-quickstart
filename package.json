@@ -23,6 +23,8 @@
     "group:common": "az group create --location southcentralus --name $npm_package_config_prefix-common",
     "group:automation": "az group create --location southcentralus --name $npm_package_config_prefix-automation",
     "group:iaas": "az group create --location southcentralus --name $npm_package_config_prefix-iaas",
+    "group:db": "az group create --location southcentralus --name $npm_package_config_prefix-db",
+    "group:k8s": "az group create --location southcentralus --name $npm_package_config_prefix-k8s",
     "provision:storage": "az group deployment create --template-file iac-storage/azuredeploy.json --parameters iac-storage/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-common",
     "provision:keyvault": "az group deployment create --template-file iac-keyvault/azuredeploy.json --parameters iac-keyvault/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-common",
     "provision:network": "az group deployment create --template-file iac-network/azuredeploy.json --parameters iac-network/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-common",
@@ -34,7 +36,9 @@
     "provision:registry": "az group deployment create --template-file iac-container/azuredeploy.json --parameters iac-container/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-common",
     "provision:activedirectory": "./iaas/activedirectory/install.sh  $npm_package_config_prefix-iaas $npm_package_config_prefix-common templates",
     "provision:jumpserver": "./iaas/jumpserver/install.sh  $npm_package_config_prefix-iaas $npm_package_config_prefix-common templates",
-    "provision:database": "./iaas/database/install.sh  $npm_package_config_prefix-iaas $npm_package_config_prefix-common templates"
+    "provision:database": "./iaas/database/install.sh  $npm_package_config_prefix-iaas $npm_package_config_prefix-common templates",
+    "provision:azuredb": "./dbas-sqldatabase/install.sh  $npm_package_config_prefix-db $npm_package_config_prefix-common templates",
+    "provision:k8s": "./iaas/k8s/install.sh $npm_package_config_prefix-k8s $npm_package_config_prefix-common"
   },
   "author": "",
   "license": "MIT"

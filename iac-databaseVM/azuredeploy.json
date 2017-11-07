@@ -137,7 +137,7 @@
         "storageProfile": {
           "imageReference": {
             "publisher": "MicrosoftSQLServer",
-            "offer": "SQL2017-WS2016",
+            "offer": "MicrosoftSQLServer",
             "sku": "[parameters('DatabaseVersion')]",
             "version": "latest"
           },
