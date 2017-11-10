@@ -39,25 +39,10 @@ az account set --subscription ${AZURE_SUBSCRIPTION}
 ## Deploy Template          ##
 ##############################
 
-#######################################
-## Retrieving Parameter Information  ##
-#######################################
-tput setaf 2; echo "Gathering information for Diagnostics Storage Account..." ; tput sgr0
-STORAGE_ACCOUNT=$(GetStorageAccount $COMMON_GROUP)
-echo $STORAGE_ACCOUNT
-
-tput setaf 2; echo "Gathering information for Key Vault..." ; tput sgr0
-KEY_VAULT=$(GetKeyVault $COMMON_GROUP)
-echo $KEY_VAULT
-
-tput setaf 2; echo "Gathering information for Network..." ; tput sgr0
-NETWORK=$(GetNetwork $COMMON_GROUP)
-echo $NETWORK
-
 
 if [ -d ./scripts ]; then BASE_DIR=$PWD; else BASE_DIR=$(dirname $PWD); fi
 
-az acs create --name=myk8sCluster \
+az acs create --name=myk8s \
   --orchestrator-type=kubernetes \
   --windows --generate-ssh-keys \
   --admin-username azureuser --admin-password Password1! \
