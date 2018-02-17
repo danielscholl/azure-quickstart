@@ -1,0 +1,2 @@
+$Env:AZURE_SUBSCRIPTION = "587fe9d7-7309-4503-bc68-b35528a3217a"        # Subscription ID for where resources will be located
+$Env:AZURE_LOCATION = "southcentralus"        # Region Location where resources will be located

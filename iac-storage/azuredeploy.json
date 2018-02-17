@@ -8,7 +8,7 @@
         "description": "Small unique string."
       },
       "minLength": 2,
-      "maxLength": 5
+      "maxLength": 9
     },
     "storageAccountType": {
       "type": "string",
@@ -28,31 +28,33 @@
     "storageAccountName": "[concat(variables('cleanUnique'), uniqueString(resourceGroup().id))]",
     "storageId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
   },
-  "resources": [{
-    "comments": "## Storage Account ##",
-    "name": "[variables('storageAccountName')]",
-    "type": "Microsoft.Storage/storageAccounts",
-    "apiVersion": "2016-01-01",
-    "location": "[resourceGroup().location]",
-    "tags": {
-      "displayName": "Storage Account"
-    },
-    "kind": "Storage",
-    "sku": {
-      "name": "[parameters('storageAccountType')]",
-      "tier": "Standard"
-    },
-    "properties": {
-      "encryption": {
-        "keySource": "Microsoft.Storage",
-        "services": {
-          "blob": {
-            "enabled": true
+  "resources": [
+    {
+      "comments": "## Storage Account ##",
+      "name": "[variables('storageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2016-01-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "Storage Account"
+      },
+      "kind": "Storage",
+      "sku": {
+        "name": "[parameters('storageAccountType')]",
+        "tier": "Standard"
+      },
+      "properties": {
+        "encryption": {
+          "keySource": "Microsoft.Storage",
+          "services": {
+            "blob": {
+              "enabled": true
+            }
           }
         }
       }
     }
-  }],
+  ],
   "outputs": {
     "storageAccount": {
       "type": "object",

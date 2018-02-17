@@ -6,7 +6,9 @@
       "type": "string",
       "metadata": {
         "description": "Small unique string."
-      }
+      },
+      "minLength": 3,
+      "maxLength": 6
     },
     "servicePrincipalAppId": {
       "type": "string",
@@ -17,76 +19,83 @@
     "adminUserName": {
       "type": "string",
       "metadata": {
-        "description": "Linux servers admin user account name."
+        "description": "Servers admin user account name."
       },
-      "defaultValue": "azureuser",
       "minLength": 1
     },
     "adminPassword": {
       "type": "string",
       "metadata": {
-        "description": "Linux servers admin user account password."
+        "description": "Servers admin user account password."
       },
       "minLength": 10
     }
   },
   "variables": {
-    "cleanPrefix": "[toLower(replace(parameters('prefix'),'-', ''))]",
-    "KeyVaultName": "[concat(variables('cleanPrefix'), '-kv-' , uniqueString(resourceGroup().id))]",
+    "cleanUnique": "[toLower(replace(parameters('prefix'),'-', ''))]",
+    "KeyVaultName": "[concat(variables('cleanUnique'), '-kv-' , uniqueString(resourceGroup().id))]",
     "KeyVaultId": "[resourceId('Microsoft.KeyVault/vaults', variables('KeyVaultName'))]"
   },
-  "resources": [{
-    "comments": "## Key Vault ##",
-    "type": "Microsoft.KeyVault/vaults",
-    "name": "[variables('KeyVaultName')]",
-    "apiVersion": "2015-06-01",
-    "location": "[resourceGroup().location]",
-    "properties": {
-      "sku": {
-        "family": "A",
-        "name": "standard"
+  "resources": [
+    {
+      "comments": "## Key Vault ##",
+      "type": "Microsoft.KeyVault/vaults",
+      "name": "[variables('KeyVaultName')]",
+      "apiVersion": "2015-06-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Company": "[parameters('prefix')]"
       },
-      "tenantId": "[subscription().tenantId]",
-      "accessPolicies": [{
+      "properties": {
+        "sku": {
+          "family": "A",
+          "name": "standard"
+        },
         "tenantId": "[subscription().tenantId]",
-        "objectId": "[parameters('servicePrincipalAppId')]",
-        "permissions": {
-          "keys": [
-            "all"
-          ],
-          "secrets": [
-            "all"
+        "accessPolicies": [
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "[parameters('servicePrincipalAppId')]",
+            "permissions": {
+              "keys": [
+                "all"
+              ],
+              "secrets": [
+                "all"
+              ]
+            }
+          }
+        ],
+        "enabledForDeployment": true,
+        "enabledForTemplateDeployment": true,
+        "enabledForVolumeEncryption": true
+      },
+      "resources": [
+        {
+          "type": "secrets",
+          "name": "adminUserName",
+          "apiVersion": "2015-06-01",
+          "properties": {
+            "value": "[parameters('adminUserName')]"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+          ]
+        },
+        {
+          "type": "secrets",
+          "name": "adminPassword",
+          "apiVersion": "2015-06-01",
+          "properties": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
           ]
         }
-      }],
-      "enabledForDeployment": true,
-      "enabledForTemplateDeployment": true,
-      "enabledForVolumeEncryption": true
-    },
-    "resources": [{
-        "type": "secrets",
-        "name": "adminUserName",
-        "apiVersion": "2015-06-01",
-        "properties": {
-          "value": "[parameters('adminUserName')]"
-        },
-        "dependsOn": [
-          "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
-        ]
-      },
-      {
-        "type": "secrets",
-        "name": "adminPassword",
-        "apiVersion": "2015-06-01",
-        "properties": {
-          "value": "[parameters('adminPassword')]"
-        },
-        "dependsOn": [
-          "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
-        ]
-      }
-    ]
-  }],
+      ]
+    }
+  ],
   "outputs": {
     "keyVault": {
       "type": "object",

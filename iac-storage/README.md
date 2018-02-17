@@ -1,43 +1,60 @@
-# Introduction
-Infrastructure as Code - Storage
+# Infrastructure as Code - Storage
 
-# Getting Started
+## Getting Started
 
 1. __Create a Resource Group__
 
 ```bash
-az group create --location southcentralus --name my-common
+az group create --location southcentralus --name common
 ```
-
-2. __Modify Template Parameters as desired__
-
-3. __Deploy Template to Resource Group__
-
-```bash
-az group deployment create --template-file azuredeploy.json --parameters azuredeploy.parameters.json --resource-group my-common
-```
-
-4. __Deploy Storage Keys to KeyVault__
 
 ```powershell
-.\scripts\loadKeyVault.ps1 my-common
+Connect-AzureRMAccount
+
+$ResourceGroupName = 'common'
+$Location = 'southcentralus'
+New-AzureRmResourceGroup -Name $ResourceGroupName -Location $Location
 ```
 
-# Build and Test
+1. __Modify Template Parameters as desired__
 
-1. To manually run the javascript test suite
+1. __Deploy Template to Resource Group__
 
 ```bash
-npm install
-npm test
+az group deployment create --name iac-storage /
+ --template-file azuredeploy.json /
+ --parameters azuredeploy.parameters.json /
+ --resource-group common
 ```
 
-2. To manually provision the resource
+```powershell
+New-AzureRmResourceGroupDeployment -Name iac-storage `
+  -TemplateFile azuredeploy.json `
+  -TemplateParameterFile azuredeploy.parameters.json `
+  -ResourceGroupName $ResourceGroupName 
+```
+
+1. __Deploy Storage Keys to KeyVault__
+
+```powershell
+.\scripts\loadKeyVault.ps1 common
+```
+
+## Script Orchestrator Deployment
+
+To further automate things but keep a good reusable generic template layer scripts can be used instead.
+
+1. __Deploy Template using PowerShell Scripts__
+
+```powershell
+./install.ps1
+```
+
+1. __Deploy Template using NPM as a Task Orchestrator
+
+>Note: Do this from the root directory where package.json lives.
 
 ```bash
-npm run provision
+npm run group:common
+npm run provision:storage
 ```
-
-3. Continuous Integration is currently turned on for this project via VSTS and the build and release jobs.
-
-> Note: Deploys to my-common-cd

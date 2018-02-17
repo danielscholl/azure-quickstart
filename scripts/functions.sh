@@ -46,6 +46,29 @@ function GetKeyVault() {
   local _vault=$(az keyvault list --resource-group $1 --query [].name -otsv)
   echo ${_vault}
 }
+function AddKeyToVault() {
+  # Required Argument $1 = KEY_VAULT
+  # Required Argument $2 = SECRET_NAME
+  # Required Argument $3 = SECRET_VALUE
+
+  if [ -z $1 ]; then
+    tput setaf 1; echo 'ERROR: Argument $1 (KEY_VAULT) not received' ; tput sgr0
+    exit 1;
+  fi
+
+  if [ -z $2 ]; then
+    tput setaf 1; echo 'ERROR: Argument $2 (SECRET_NAME) not received' ; tput sgr0
+    exit 1;
+  fi
+
+  if [ -z $3 ]; then
+    tput setaf 1; echo 'ERROR: Argument $3 (SECRET_VALUE) not received' ; tput sgr0
+    exit 1;
+  fi
+
+  local _secret=$(az keyvault secret set --vault-name $1 --name $2 --value $3)
+  echo ${_secret}
+}
 function CreateStorageAccount() {
   # Required Argument $1 = RESOURCE_GROUP
 
