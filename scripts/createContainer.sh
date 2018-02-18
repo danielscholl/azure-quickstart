@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #
-#  Purpose: Generate a Storage Account Security Token for a container in a storage account
+#  Purpose: Generate a Container in a Storage Account
 #  Usage:
-#    loadKeyVault.sh <resourcegroup>
+#    createContainer.sh <resourcegroup> <containername>
 
 
 ###############################
 ## ARGUMENT INPUT            ##
 ###############################
-usage() { echo "Usage: loadKeyVault.sh <resourcegroup>" 1>&2; exit 1; }
+usage() { echo "Usage: createContainer.sh <resourcegroup> <containername>" 1>&2; exit 1; }
 
 if [ -f ~/.azure/.env ]; then source ~/.azure/.env; fi
 if [ -f ./.env ]; then source ./.env; fi
@@ -23,6 +23,12 @@ if [ -z $RESOURCE_GROUP ]; then
   usage;
 fi
 
+if [ ! -z $2 ]; then CONTAINER_NAME=$2; fi
+if [ -z $CONTAINER_NAME ]; then
+  tput setaf 1; echo 'ERROR: CONTAINER_NAME not provided' ; tput sgr0
+  usage;
+fi
+
 
 ###############################
 ## Azure Intialize           ##
@@ -32,13 +38,10 @@ az account set --subscription ${AZURE_SUBSCRIPTION}
 
 
 ####################################
-## Storage Account Keys to Vault  ##
+## Storage Account Container      ##
 ####################################
-tput setaf 2; echo 'Locating Storage Account in ResourceGroup ${RESOURCE_GROUP}...' ; tput sgr0
+tput setaf 2; echo 'Creating Container for Storage Account in ResourceGroup ${RESOURCE_GROUP}...' ; tput sgr0
 
 STORAGE_ACCOUNT=$(GetStorageAccount $RESOURCE_GROUP)
-STORAGE_ACCOUNT_KEY=$(GetStorageAccountKey $RESOURCE_GROUP $STORAGE_ACCOUNT)
-echo $STORAGE_ACCOUNT_KEY
-
-KEY_VAULT=$(GetKeyVault $RESOURCE_GROUP)
-SECRET=$(AddKeyToVault $KEY_VAULT diagPrimaryKey $STORAGE_ACCOUNT_KEY)
+STORAGE_KEY=$(GetStorageAccountKey $RESOURCE_GROUP $STORAGE_ACCOUNT)
+CreateBlobContainer $STORAGE_ACCOUNT $STORAGE_KEY $CONTAINER_NAME

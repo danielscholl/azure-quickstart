@@ -137,26 +137,36 @@ function GetStorageConnection() {
   echo $_result
 }
 function CreateBlobContainer() {
-  # Required Argument $1 = CONTAINER_NAME
-  # Required Argument $2 CONNECTION
+  # Required Argument $1 = STORAGE_ACCOUNT
+  # Required Argument $2 = STORAGE_KEY
+  # Required Argument $3 = CONTAINER_NAME
 
   if [ -z $1 ]; then
-    tput setaf 1; echo 'ERROR: Argument $1 (CONTAINER_NAME) not received' ; tput sgr0
-    exit 1;
-  fi
-  if [ -z $2 ]; then
-    tput setaf 1; echo 'ERROR: Argument $2 (STORAGE_CONNECTION) not received' ; tput sgr0
+    tput setaf 1; echo 'ERROR: Argument $1 (STORAGE_ACCOUNT) not received' ; tput sgr0
     exit 1;
   fi
 
- az storage container create --name $1 \
-    --connection-string $2 \
+  if [ -z $2 ]; then
+    tput setaf 1; echo 'ERROR: Argument $2 (STORAGE_KEY) not received' ; tput sgr0
+    exit 1;
+  fi
+
+  if [ -z $3 ]; then
+    tput setaf 1; echo 'ERROR: Argument $3 (CONTAINER_NAME) not received' ; tput sgr0
+    exit 1;
+  fi
+
+ az storage container create \
+    --account-name $1 \
+    --account-key $2 \
+    --name $3 \
     -ojsonc
 }
 function UploadFile() {
   # Required Argument $1 = FILE_NAME
-  # Required Argument $1 = CONTAINER_NAME
+  # Required Argument 21 = CONTAINER_NAME
   # Required Argument $2 CONNECTION
+  # Optional Argument $4 BLOB_NAME
 
   if [ -z $1 ]; then
     tput setaf 1; echo 'ERROR: Argument $1 (FILE_NAME) not received' ; tput sgr0
@@ -171,7 +181,10 @@ function UploadFile() {
     exit 1;
   fi
 
-  BLOB_NAME=${1##*/}
+  if [ ! -z $4 ]; then BLOB_NAME=$4; fi
+  if [ -z BLOB_NAME ]; then
+    BLOB_NAME=${1##*/}
+  fi
 
   tput setaf 4; echo -e "\n{\n  CONTAINER: '$2'\n  NAME: '$1'\n  BLOB: '$BLOB_NAME'\n}" ; tput sgr0
   az storage blob upload --name $BLOB_NAME \
