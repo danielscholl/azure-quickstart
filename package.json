@@ -17,6 +17,7 @@
     "test-reporter": "tap tests/*.spec.js --reporter xunit --output-file .test-output/raw.txt > .test-output/results.xml",
     "start": "watch 'clear && npm run -s test-template' .",
     "sync": "npm run sync:runbooks && npm run sync:dsc",
+    "sync:templates": "./scripts/uploadTemplates.sh",
     "sync:runbooks": "./scripts/sync.sh $npm_package_config_prefix-automation runbooks",
     "sync:dsc": "./scripts/sync.sh $npm_package_config_prefix-automation dsc",
     "group": "npm run group:common && npm run group:automation && npm run group:iaas",
