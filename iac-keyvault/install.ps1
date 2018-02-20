@@ -13,7 +13,7 @@
 
 Param(
   [string] $Subscription = $env:AZURE_SUBSCRIPTION,
-  [string] $ResourceGroupName = $env:AZURE_SUBSCRIPTION,
+  [string] $ResourceGroupName,
   [string] $Location = $env:AZURE_LOCATION,
   [string] $servicePrincipalAppId
 )
