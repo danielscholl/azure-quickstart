@@ -31,6 +31,22 @@ if ($Base -eq $true) {
   & ./iac-keyvault/install.ps1 -ResourceGroupName common
   & ./iac-network/install.ps1 -ResourceGroupName common
 
+  & .\scripts\createContainer.ps1 -ResourceGroupName common -ContainerName templates
+
+  & .\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-storage -BlobName deployStorage.json
+  & .\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-keyvault -BlobName deployKeyVault.json
+  & .\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-network -BlobName deployNetwork.json
+  & .\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-functions -BlobName deployFunctions.json
+  & .\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-automation -BlobName deployAutomation.json
+  & .\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-singleVM -BlobName deploySingleVM.json
+  & .\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-databaseVM -BlobName deployDatabaseVM.json
+  & .\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-publicVM -BlobName deployPublicVM.json
+  & .\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart ext-omsMonitor -BlobName deployOMSExtension.json
+  & .\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart ext-dscNode -BlobName deployDSCExtension.json
+  & .\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart ext-domainJoin -BlobName deployDomainJoinExtension.json
+
+  & .\scripts\loadKeyVault.ps1 -ResourceGroupName common
+
   Write-Host "---------------------------------------------" -ForegroundColor "blue"
   Write-Host "Base Components have been installed!!!!!" -foregroundcolor "red"
   Write-Host "---------------------------------------------" -ForegroundColor "blue"

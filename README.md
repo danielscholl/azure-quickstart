@@ -41,19 +41,19 @@ Upload the templates into the storage container to allow for nested templates.
 >NOTE: OBSOLETE Move this to powershell execution README
 
 ```powershell
-.\scripts\createContainer.ps1 -ResourceGroupName my-common -ContainerName templates
+.\scripts\createContainer.ps1 -ResourceGroupName common -ContainerName templates
 
-.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-storage -BlobName deployStorage.json
-.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-keyvault -BlobName deployKeyVault.json
-.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-network -BlobName deployNetwork.json
-.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-functions -BlobName deployFunctions.json
-.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-automation -BlobName deployAutomation.json
-.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-singleVM -BlobName deploySingleVM.json
-.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-databaseVM -BlobName deployDatabaseVM.json
-.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart iac-publicVM -BlobName deployPublicVM.json
-.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart ext-omsMonitor -BlobName deployOMSExtension.json
-.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart ext-dscNode -BlobName deployDSCExtension.json
-.\scripts\uploadFile.ps1 -ResourceGroupName my-common -QuickStart ext-domainJoin -BlobName deployDomainJoinExtension.json
+.\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-storage -BlobName deployStorage.json
+.\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-keyvault -BlobName deployKeyVault.json
+.\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-network -BlobName deployNetwork.json
+.\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-functions -BlobName deployFunctions.json
+.\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-automation -BlobName deployAutomation.json
+.\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-singleVM -BlobName deploySingleVM.json
+.\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-databaseVM -BlobName deployDatabaseVM.json
+.\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart iac-publicVM -BlobName deployPublicVM.json
+.\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart ext-omsMonitor -BlobName deployOMSExtension.json
+.\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart ext-dscNode -BlobName deployDSCExtension.json
+.\scripts\uploadFile.ps1 -ResourceGroupName common -QuickStart ext-domainJoin -BlobName deployDomainJoinExtension.json
 ```
 
 ## Provision Common KeyVault
@@ -75,7 +75,7 @@ Load the Common Storage Keys into the Keyvault.
 >NOTE: OBSOLETE Move this to powershell execution README
 
 ```powershell
-.\scripts\loadKeyVault.ps1 -ResourceGroupName my-common
+.\scripts\loadKeyVault.ps1 -ResourceGroupName common
 ```
 
 ## Provision Common Network
