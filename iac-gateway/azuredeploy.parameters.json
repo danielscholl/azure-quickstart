@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "prefix": {
+      "value": "common"
+    },
+    "localSubnetPrefix": {
+      "value": "10.0.0.0/24"
+    },
+    "localGatewayName": {
+      "value": "remoteNetwork"
+    },
+    "localGatewayIP": {
+      "value": "192.168.1.1"
+    },
+    "vpnSharedKey": {
+      "value": "azureVPNKey"
+    }
+  }
+}
