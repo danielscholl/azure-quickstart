@@ -41,13 +41,17 @@ az account set --subscription ${AZURE_SUBSCRIPTION}
 ##############################
 tput setaf 2; echo "Creating the $CONTAINER blob container..." ; tput sgr0
 STORAGE_ACCOUNT=$(GetStorageAccount $RESOURCE_GROUP)
+STORAGE_KEY=$(GetStorageAccountKey $RESOURCE_GROUP $STORAGE_ACCOUNT)
 CONNECTION=$(GetStorageConnection $RESOURCE_GROUP $STORAGE_ACCOUNT)
-CreateBlobContainer $CONTAINER $CONNECTION
+
+CreateBlobContainer $STORAGE_ACCOUNT $STORAGE_KEY $CONTAINER
 
 if [ -d ./scripts ]; then BASE_DIR=$PWD; else BASE_DIR=$(dirname $PWD); fi
 FILES=$BASE_DIR/automation/$CONTAINER/*
 
 for f in $FILES
 do
-  if [ -f "${f}" ]; then UploadFile $f $CONTAINER $CONNECTION; fi
+  NAME="${f##*/}"
+  NAME="${NAME%.*}"
+  if [ -f "${f}" ]; then UploadFile $f $CONTAINER $CONNECTION $NAME; fi
 done
