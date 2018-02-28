@@ -44,5 +44,4 @@ New-AzureRmResourceGroupDeployment -Name $DEPLOYMENT `
   -TemplateFile $BASE_DIR\azuredeploy.json `
   -TemplateParameterFile $BASE_DIR\azuredeploy.parameters.json `
   -prefix $ResourceGroupName `
-  -localGatewayName "$ExternalNetwork" `
   -ResourceGroupName $ResourceGroupName

@@ -20,6 +20,7 @@
 Param(
   [boolean] $Base = $false,
   [boolean] $Gateway = $false,
+  [boolean] $DevOps = $false,
   [boolean] $Server = $false
 )
 . ./.env.ps1
@@ -49,6 +50,17 @@ if ($Base -eq $true) {
 
   Write-Host "---------------------------------------------" -ForegroundColor "blue"
   Write-Host "Base Components have been installed!!!!!" -foregroundcolor "red"
+  Write-Host "---------------------------------------------" -ForegroundColor "blue"
+}
+
+if ($DevOps -eq $true) {
+  Write-Host "Install DevOps Resources here we go...." -foregroundcolor "cyan"
+
+  & ./iac-storage/install.ps1 -ResourceGroupName devops
+  & ./iac-automation/install.ps1 -ResourceGroupName devops
+
+  Write-Host "---------------------------------------------" -ForegroundColor "blue"
+  Write-Host "Devops Components have been installed!!!!!" -foregroundcolor "red"
   Write-Host "---------------------------------------------" -ForegroundColor "blue"
 }
 
