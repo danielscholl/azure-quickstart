@@ -14,7 +14,7 @@ alias uuid="python -c 'import sys,uuid; sys.stdout.write(uuid.uuid4().hex)' | pb
 1. __Create a Resource Group__
 
 ```bash
-az group create --location southcentralus --name my-automation
+az group create --location southcentralus --name my-devops
 ```
 
 2. __Modify Template Parameters as desired__
@@ -22,14 +22,5 @@ az group create --location southcentralus --name my-automation
 3. __Deploy Template to Resource Group__
 
 ```bash
-az group deployment create --template-file azuredeploy.json --parameters azuredeploy.parameters.json --resource-group my-automation
-```
-
-# Build and Test
-
-1. To manually run the javascript test suite
-
-```bash
-npm install
-npm test
+az group deployment create --template-file azuredeploy.json --parameters azuredeploy.parameters.json --resource-group my-devops
 ```

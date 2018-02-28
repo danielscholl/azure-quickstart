@@ -3,7 +3,7 @@ Infrastructure as Code - Network
 
 # Getting Started
 
-1. __Create DevOps Resource Goup__
+1. __Create Common Resource Goup__
 
 ```powershell
 Login-AzureRMAccount
