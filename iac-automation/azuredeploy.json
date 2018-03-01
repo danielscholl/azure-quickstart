@@ -243,6 +243,13 @@
         "description": "Runbook to start servers",
         "type": "PowerShell",
         "Id": ""
+      },
+      "passwordreset": {
+        "name": "password-reset",
+        "version": "1.0.0.0",
+        "description": "Runbook to reset Azure AD Passwords",
+        "type": "PowerShell",
+        "Id": ""
       }
     },
     "configurations": {
