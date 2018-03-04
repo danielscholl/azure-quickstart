@@ -34,10 +34,17 @@ function Get-ScriptDirectory {
   $Invocation = (Get-Variable MyInvocation -Scope 1).Value
   Split-Path $Invocation.MyCommand.Path
 }
-function LoginAzure {
+function LoginAzure() {
   Write-Color -Text "Logging in and setting subscription..." -Color Green
-  if ([string]::IsNullOrEmpty($(Get-AzureRmContext).Account)) {Login-AzureRmAccount}
+  if ([string]::IsNullOrEmpty($(Get-AzureRmContext).Account)) {
+    if($env:AZURE_TENANT) {
+      Login-AzureRmAccount -TenantId $env:AZURE_TENANT
+    } else {
+      Login-AzureRmAccount
+    }
+  }
   Set-AzureRmContext -SubscriptionId ${Subscription} | Out-null
+  
 }
 function CreateResourceGroup([string]$ResourceGroupName, [string]$Location) {
   # Required Argument $1 = RESOURCE_GROUP

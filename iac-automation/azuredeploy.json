@@ -942,6 +942,29 @@
           }
         },
         {
+          "name": "[variables('runbooks').passwordreset.name]",
+          "type": "runbooks",
+          "apiVersion": "2015-10-31",
+          "location": "[parameters('automationRegion')]",
+          "dependsOn": [
+            "[concat('Microsoft.Automation/automationAccounts/', variables('automationAccountName'))]",
+            "[concat('Microsoft.Automation/automationAccounts/', variables('automationAccountName'), '/Modules/', variables('psModules').azureRmProfile.name)]",
+            "[concat('Microsoft.Automation/automationAccounts/', variables('automationAccountName'), '/Modules/', variables('psModules').azureRmCompute.name)]",
+            "[concat('Microsoft.Automation/automationAccounts/', variables('automationAccountName'), '/Modules/', variables('psModules').azureRmAutomation.name)]"
+          ],
+          "tags": {},
+          "properties": {
+            "runbookType": "[variables('runbooks').passwordreset.type]",
+            "logProgress": "false",
+            "logVerbose": "false",
+            "description": "[variables('runbooks').passwordreset.description]",
+            "publishContentLink": {
+              "uri": "[concat(variables('assetLocation'),'/runbooks/password-reset.ps1',parameters('runbookSasToken'))]",
+              "version": "[variables('runbooks').passwordreset.version]"
+            }
+          }
+        },
+        {
           "name": "[variables('runbooks').bootstrap.scheduleName]",
           "type": "schedules",
           "apiVersion": "2015-10-31",

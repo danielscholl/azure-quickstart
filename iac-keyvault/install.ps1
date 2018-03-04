@@ -15,7 +15,7 @@ Param(
   [string] $Subscription = $env:AZURE_SUBSCRIPTION,
   [string] $ResourceGroupName,
   [string] $Location = $env:AZURE_LOCATION,
-  [string] $servicePrincipalAppId
+  [string] $servicePrincipalAppId = $env:AZURE_PRINCIPAL
 )
 
 if (Test-Path ..\scripts\functions.ps1) { . ..\scripts\functions.ps1 }
@@ -49,13 +49,18 @@ Register-AzureRmResourceProvider -ProviderNamespace Microsoft.KeyVault
 ## Deploy Template          ##
 ##############################
 Write-Color -Text "Gathering Service Principal..." -Color Green
-$ACCOUNT = $(Get-AzureRmContext).Account
-if ($ACCOUNT.Type -eq 'User') {
-  $USER = Get-AzureRmADUser -UPN $(Get-AzureRmContext).Account
-  $ID = $USER.Id.Guid
+if ($servicePrincipalAppId) {
+  $ID = $servicePrincipalAppId
 }
 else {
-  $ID = Read-Host 'Input your Service Principal.'
+  $ACCOUNT = $(Get-AzureRmContext).Account
+  if ($ACCOUNT.Type -eq 'User') {
+    $USER = Get-AzureRmADUser -UPN $(Get-AzureRmContext).Account
+    $ID = $USER.Id.Guid
+  }
+  else {
+    $ID = Read-Host 'Input your Service Principal.'
+  }
 }
 
 Write-Color -Text "Key Vault Service Principal: ", "$ID" -Color Green, Red
