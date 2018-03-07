@@ -2,28 +2,28 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "vmName": {
+    "vmList": {
       "type": "string",
       "metadata": {
-        "description": "Name of the existing VM to apply the DSC configuration to"
-      }
-    },
-    "username": {
-      "type": "string",
-      "metadata": {
-        "description": "Domain Admin Account Name also used as Local Machine Admin User"
-      }
-    },
-    "password": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Domain Admin Account Password also used as Local Machine Admin User Password"
+        "description": "Name of the Virtual Machines to be domain joined.  ie: VM01, VM02, VM03"
       }
     },
     "domain": {
       "type": "string",
       "metadata": {
         "description": "The FQDN of the AD domain"
+      }
+    },
+    "domainAdmin": {
+      "type": "string",
+      "metadata": {
+        "description": "Domain Admin Account Name also used as Local Machine Admin User"
+      }
+    },
+    "domainPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Domain Admin Account Password also used as Local Machine Admin User Password"
       }
     },
     "domainOptions": {
@@ -41,13 +41,19 @@
       "defaultValue": ""
     }
   },
-  "variables": {},
+  "variables": {
+    "vmListArray" : "[split(parameters('vmList'),',')]"
+  },
   "resources": [{
     "comments": "## Domain Join Extension ##",
     "type": "Microsoft.Compute/virtualMachines/extensions",
-    "name": "[concat(parameters('vmName'),'/DomainJoinExtension')]",
+    "name": "[concat(trim(variables('vmListArray')[copyIndex()]),'/joindomain')]",
     "apiVersion": "2015-06-15",
     "location": "[resourceGroup().location]",
+    "copy": {
+      "name": "vmDomainJoinCopy",
+      "count": "[length(variables('vmListArray'))]"
+  },
     "properties": {
       "publisher": "Microsoft.Compute",
       "type": "JsonADDomainExtension",
@@ -55,13 +61,13 @@
       "autoUpgradeMinorVersion": true,
       "settings": {
         "Name": "[parameters('domain')]",
-        "OUPath": "[parameters('ouPath')]",
-        "User": "[concat(parameters('domain'), '\\', parameters('username'))]",
+        "User": "[concat(parameters('domain'), '\\', parameters('domainAdmin'))]",
         "Restart": "true",
-        "Options": "[parameters('domainOptions')]"
+        "Options": "[parameters('domainOptions')]",
+        "OUPath": "[parameters('ouPath')]"
       },
       "protectedSettings": {
-        "Password": "[parameters('password')]"
+        "Password": "[parameters('domainPassword')]"
       }
     }
   }]

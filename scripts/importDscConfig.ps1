@@ -17,7 +17,7 @@ Param(
   [Parameter(Mandatory = $true)]
   [string] $ResourceGroup,
 
-  [string] $DscPath = "./automation/dsc/",
+  [string] $DscPath = "./iac-automation/dsc/",
   [string] $dscDataConfig = $dscRole + "-config.ps1",
   [bool] $Force = $false
 )

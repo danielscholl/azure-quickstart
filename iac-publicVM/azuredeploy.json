@@ -2,20 +2,27 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "prefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Small unique string."
+      },
+      "minLength": 3,
+      "maxLength": 6
+    },
     "vmName": {
       "type": "string",
       "metadata": {
         "description": "Virtual Machine 1 Server Name."
       },
-      "defaultValue": "vm",
-      "minLength": 1
+      "minLength": 2,
+      "maxLength": 4
     },
     "vmSize": {
       "type": "string",
       "metadata": {
         "description": "The virtual machine server size."
-      },
-      "defaultValue": "Standard_A1"
+      }
     },
     "vnetGroup": {
       "type": "string",
@@ -35,6 +42,22 @@
         "description": "Subnet ID to associate VM to."
       }
     },
+    "useImage": {
+      "type": "string",
+      "allowedValues": [
+          "Yes",
+          "No"
+      ],
+      "metadata": {
+          "description": "Select whether an image should be used to create resource."
+      }
+    },
+    "managedImageId": {
+      "type": "string",
+      "metadata": {
+        "description": "The Windows Image Name"
+      }
+    },
     "WindowsOSVersion": {
       "type": "string",
       "metadata": {
@@ -50,13 +73,13 @@
         "2016-Datacenter"
       ]
     },
-    "storageAccountName": {
+    "diagnosticsStorageName": {
       "type": "string",
       "metadata": {
         "description": "Storage Account Name for Diagnostic Logs"
       }
     },
-    "storageAccountKey": {
+    "diagnosticsStorageKey": {
       "type": "securestring",
       "metadata": {
         "description": "Storage Account Key for Diagnostic Logs"
@@ -66,29 +89,32 @@
       "type": "string",
       "metadata": {
         "description": "Remote Access CIDR"
-      },
-      "defaultValue": "Internet"
+      }
     },
-    "username": {
+    "adminUserName": {
       "type": "string",
       "metadata": {
         "description": "Domain Admin Account Name also used as Local Machine Admin User"
-      }
+      },
+      "minLength": 4
     },
-    "password": {
+    "adminPassword": {
       "type": "securestring",
       "metadata": {
         "description": "Domain Admin Account Password also used as Local Machine Admin User Password"
-      }
+      },
+      "minLength": 12
     }
   },
   "variables": {
-    "NicName": "[concat(parameters('vmName'), '-nic')]",
+    "cleanPrefix": "[toLower(parameters('prefix'))]",
+    "vmName": "[concat(variables('cleanPrefix'), '-', parameters('vmName'))]",
+    "NicName": "[concat(variables('vmName'),'-nic')]",
     "vnetID": "[resourceId(parameters('vnetGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnet'))]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('subnet'))]",
-    "NsgName": "[concat(parameters('vmName'), '-nsg')]",
+    "NsgName": "[concat(variables('vmName'), '-nsg')]",
     "NsgId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NsgName'))]",
-    "PublicIpName": "[concat(parameters('vmName'), '-ip')]",
+    "PublicIpName": "[concat(variables('vmName'), '-ip')]",
     "wadlogs": "<WadCfg> <DiagnosticMonitorConfiguration overallQuotaInMB=\"4096\" xmlns=\"http://schemas.microsoft.com/ServiceHosting/2010/10/DiagnosticsConfiguration\"> <DiagnosticInfrastructureLogs scheduledTransferLogLevelFilter=\"Error\"/> <WindowsEventLog scheduledTransferPeriod=\"PT1M\" > <DataSource name=\"Application!*[System[(Level = 1 or Level = 2)]]\" /> <DataSource name=\"Security!*[System[(Level = 1 or Level = 2)]]\" /> <DataSource name=\"System!*[System[(Level = 1 or Level = 2)]]\" /></WindowsEventLog>",
     "wadperfcounters1": "<PerformanceCounters scheduledTransferPeriod=\"PT1M\"><PerformanceCounterConfiguration counterSpecifier=\"\\Processor(_Total)\\% Processor Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU utilization\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor(_Total)\\% Privileged Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU privileged time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor(_Total)\\% User Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU user time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor Information(_Total)\\Processor Frequency\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"CPU frequency\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\System\\Processes\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"Processes\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Process(_Total)\\Thread Count\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"Threads\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Process(_Total)\\Handle Count\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"Handles\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\% Committed Bytes In Use\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Memory usage\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\Available Bytes\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory available\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\Committed Bytes\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory committed\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\Commit Limit\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory commit limit\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\% Disk Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Disk active time\" locale=\"en-us\"/></PerformanceCounterConfiguration>",
     "wadperfcounters2": "<PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\% Disk Read Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Disk active read time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\% Disk Write Time\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Disk active write time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\Disk Transfers/sec\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk operations\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\Disk Reads/sec\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk read operations\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\Disk Writes/sec\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk write operations\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\Disk Bytes/sec\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk speed\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\Disk Read Bytes/sec\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk read speed\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk(_Total)\\Disk Write Bytes/sec\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk write speed\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\LogicalDisk(_Total)\\% Free Space\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Disk free space (percentage)\" locale=\"en-us\"/></PerformanceCounterConfiguration></PerformanceCounters>",
@@ -98,12 +124,12 @@
   },
   "resources": [{
       "comments": "## Network Security Group ##",
-      "name": "[concat(parameters('vmName'), '-nsg')]",
+      "name": "[concat(variables('NsgName'))]",
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2015-05-01-preview",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "Network Security Group - Remote Access"
+        "Company": "[parameters('prefix')]"
       },
       "properties": {
         "securityRules": [{
@@ -129,7 +155,7 @@
       "apiVersion": "2015-06-15",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "Public IP Address - JumpServer"
+        "Company": "[parameters('prefix')]"
       },
       "properties": {
         "publicIPAllocationMethod": "Dynamic"
@@ -142,10 +168,11 @@
       "apiVersion": "2016-03-30",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "Network Interface - JumpServer"
+        "Company": "[parameters('prefix')]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses', variables('PublicIpName'))]"
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('PublicIpName'))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NsgName'))]"
       ],
       "properties": {
         "ipConfigurations": [{
@@ -166,7 +193,7 @@
         "diagnosticsProfile": {
           "bootDiagnostics": {
             "enabled": true,
-            "storageUri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net')]"
+            "storageUri": "[concat('http://', parameters('diagnosticsStorageName'), '.blob.core.windows.net')]"
           }
         }
       }
@@ -174,11 +201,11 @@
     {
       "comments": "## Virtual Machine ##",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[parameters('vmName')]",
+      "name": "[variables('vmName')]",
       "apiVersion": "2016-04-30-preview",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "Virtual Machine - JumpServer"
+        "Company": "[parameters('prefix')]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', variables('NicName'))]"
@@ -188,16 +215,17 @@
           "vmSize": "[parameters('vmSize')]"
         },
         "osProfile": {
-          "computerName": "[parameters('vmName')]",
-          "adminUsername": "[parameters('username')]",
-          "adminPassword": "[parameters('password')]"
+          "computerName": "[variables('vmName')]",
+          "adminUsername": "[parameters('adminUserName')]",
+          "adminPassword": "[parameters('adminPassword')]"
         },
         "storageProfile": {
           "imageReference": {
-            "publisher": "MicrosoftWindowsServer",
-            "offer": "WindowsServer",
-            "sku": "[parameters('WindowsOSVersion')]",
-            "version": "latest"
+            "id": "[if(equals(parameters('useImage'), 'Yes'), parameters('managedImageId'), json('null'))]",
+            "publisher": "[if(equals(parameters('useImage'), 'Yes'), json('null'), 'MicrosoftWindowsServer')]",
+            "offer": "[if(equals(parameters('useImage'), 'Yes'), json('null'), 'WindowsServer')]",
+            "sku": "[if(equals(parameters('useImage'), 'Yes'), json('null'), parameters('WindowsOSVersion'))]",
+            "version": "[if(equals(parameters('useImage'), 'Yes'), json('null'), 'latest')]"
           },
           "osDisk": {
             "createOption": "FromImage"
@@ -211,7 +239,7 @@
         "diagnosticsProfile": {
           "bootDiagnostics": {
             "enabled": true,
-            "storageUri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net')]"
+            "storageUri": "[concat('http://', parameters('diagnosticsStorageName'), '.blob.core.windows.net')]"
           }
         }
       },
@@ -221,7 +249,7 @@
           "apiVersion": "2016-04-30-preview",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-            "[parameters('vmName')]"
+            "[variables('vmName')]"
           ],
           "tags": {
             "displayName": "BGInfoExtension"
@@ -241,7 +269,7 @@
           "apiVersion": "2016-04-30-preview",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-            "[parameters('vmName')]"
+            "[variables('vmName')]"
           ],
           "tags": {
             "displayName": "AzureDiagnostics"
@@ -252,17 +280,47 @@
             "typeHandlerVersion": "1.5",
             "autoUpgradeMinorVersion": true,
             "settings": {
-              "xmlCfg": "[base64(concat(variables('wadcfgxstart'), variables('wadmetricsresourceid'), parameters('vmName'), variables('wadcfgxend')))]",
-              "storageAccount": "[parameters('storageAccountName')]"
+              "xmlCfg": "[base64(concat(variables('wadcfgxstart'), variables('wadmetricsresourceid'), variables('vmName'), variables('wadcfgxend')))]",
+              "storageAccount": "[parameters('diagnosticsStorageName')]"
             },
             "protectedSettings": {
-              "storageAccountName": "[parameters('storageAccountName')]",
-              "storageAccountKey": "[parameters('storageAccountKey')]"
+              "storageAccountName": "[parameters('diagnosticsStorageName')]",
+              "storageAccountKey": "[parameters('diagnosticsStorageKey')]"
             }
           }
         }
       ]
+    },
+    {
+      "comments": "## Auto Shutdown ##",
+      "name": "[concat('shutdown-computevm-', variables('vmName'))]",
+      "type": "microsoft.devtestlab/schedules",
+      "apiVersion": "2016-05-15",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "status": "Enabled",
+        "taskType": "ComputeVmShutdownTask",
+        "dailyRecurrence": {
+          "time": "1800"
+        },
+        "timeZoneId": "Central Standard Time",
+        "notificationSettings": {
+          "status": "Disabled",
+          "timeInMinutes": 30
+        },
+        "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', variables('vmname'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines', variables('vmname'))]"
+      ]
     }
   ],
-  "outputs": {}
+  "outputs": {
+    "virtualMachine": {
+      "type": "object",
+      "value": {
+        "name": "[variables('vmName')]"
+      }
+    }
+  }
 }

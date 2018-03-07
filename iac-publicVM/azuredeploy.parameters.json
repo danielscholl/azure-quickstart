@@ -2,17 +2,32 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "prefix": {
+      "value": "my"
+    },
     "vnetGroup": {
-      "value": "my-common"
+      "value": "common"
     },
     "vnet": {
-      "value": "my-vnet"
+      "value": "common-vnet"
     },
     "subnet": {
       "value": "front_subnet"
     },
+    "vmName": {
+      "value": "jump"
+    },
     "vmSize": {
-      "value": "Standard_A1"
+      "value": "Standard_DS1_v2"
+    },
+    "useImage": {
+      "value": "No"
+    },
+    "adminUserName": {
+      "value": "azureuser"
+    },
+    "remoteAccessACL": {
+      "value": "Internet"
     }
   }
 }
