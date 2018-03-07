@@ -140,57 +140,62 @@
       ]
     },
     "psModules": {
-      "azureRmProfile": {
-        "name": "AzureRm.Profile",
-        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.profile.4.1.1.nupkg"
-      },
-      "azureStorage": {
-        "name": "Azure.Storage",
-        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azure.storage.4.0.2.nupkg"
-      },
-      "azureRmStorage": {
-        "name": "AzureRm.Storage",
-        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.storage.4.1.0.nupkg"
-      },
       "azure": {
         "name": "Azure",
         "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azure.5.1.1.nupkg"
       },
-      "azureRmResources": {
-        "name": "AzureRm.Resources",
-        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.resources.5.1.1.nupkg"
+      "azureStorage": {
+        "name": "Azure.Storage",
+        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azure.storage.4.1.1.nupkg"
       },
+
       "azureRmAutomation": {
         "name": "AzureRm.Automation",
-        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.automation.4.1.1.nupkg"
-      },
-      "azureRmCompute": {
-        "name": "AzureRm.Compute",
-        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.compute.4.1.1.nupkg"
-      },
-      "azureRmSql": {
-        "name": "AzureRm.Sql",
-        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.sql.4.1.1.nupkg"
-      },
-      "azureRmOperationalInsights": {
-        "name": "AzureRm.OperationalInsights",
-        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.operationalinsights.4.0.0.nupkg"
-      },
-      "azureRmSiteRecovery": {
-        "name": "AzureRm.SiteRecovery",
-        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.siterecovery.5.0.3.nupkg"
-      },
-      "azureRmRecoveryServices": {
-        "name": "AzureRm.RecoveryServices",
-        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.recoveryservices.4.0.1.nupkg"
+        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.automation.4.2.1.nupkg"
       },
       "azureRmBackup": {
         "name": "AzureRm.Backup",
-        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.backup.4.0.1.nupkg"
+        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.backup.4.0.2.nupkg"
+      },
+      "azureRmCompute": {
+        "name": "AzureRm.Compute",
+        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.compute.4.3.2.nupkg"
       },
       "azureRmKeyVault": {
         "name": "AzureRm.KeyVault",
-        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.keyvault.4.0.1.nupkg"
+        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.keyvault.4.1.1.nupkg"
+      },
+      "azureRmOperationalInsights": {
+        "name": "AzureRm.OperationalInsights",
+        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.operationalinsights.4.2.0.nupkg"
+      },
+      "azureRmProfile": {
+        "name": "AzureRm.Profile",
+        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.profile.4.3.1.nupkg"
+      },
+      "azureRmRecoveryServices": {
+        "name": "AzureRm.RecoveryServices",
+        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.recoveryservices.4.0.2.nupkg"
+      },
+      "azureRmResources": {
+        "name": "AzureRm.Resources",
+        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.resources.5.4.0.nupkg"
+      },
+      "azureRmSiteRecovery": {
+        "name": "AzureRm.SiteRecovery",
+        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.siterecovery.5.0.4.nupkg"
+      },
+      "azureRmSql": {
+        "name": "AzureRm.Sql",
+        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.sql.4.2.0.nupkg"
+      },
+      "azureRmStorage": {
+        "name": "AzureRm.Storage",
+        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.storage.4.2.1.nupkg"
+      },
+      "azureRmWebsites": {
+        "name": "AzureRm.Websites",
+        "url": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.websites.4.1.0.nupkg"
       },
       "xComputerManagement": {
         "name": "xComputerManagement",
@@ -778,6 +783,21 @@
           "properties": {
             "contentLink": {
               "uri": "[variables('psModules').azureRmKeyVault.url]"
+            }
+          }
+        },
+        {
+          "name": "[variables('psModules').azureRmWebsites.name]",
+          "type": "Modules",
+          "apiVersion": "2015-10-31",
+          "tags": {},
+          "dependsOn": [
+            "[concat('Microsoft.Automation/automationAccounts/', variables('automationAccountName'))]",
+            "[concat('Microsoft.Automation/automationAccounts/', variables('automationAccountName'), '/Modules/', variables('psModules').azureRmProfile.name)]"
+          ],
+          "properties": {
+            "contentLink": {
+              "uri": "[variables('psModules').azureRmWebsites.url]"
             }
           }
         },

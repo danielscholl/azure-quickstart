@@ -3,7 +3,7 @@
         This runbook scales up an App Service Plan in an Azure Resource Group.
 
     .PARAMETER ResourceGroupName
-        Name of the Azure Resource Group containing the VMs to be started.
+        Name of the Azure Resource Group containing the App Plan to be scaled.
 
     .NOTES
         AUTHOR: Daniel Scholl
@@ -11,7 +11,8 @@
 
 Param(
   [string]$resourceGroupName,
-  [string]$sku=
+  [string]$sku,
+  [string]$size = "Small"
 )
 
 $connectionName = "AzureRunAsConnection"
@@ -23,7 +24,6 @@ try {
 
   #-----L O G I N - A U T H E N T I C A T I O N-----
   Write-Output "Logging into Azure Account..."
-
 
   Add-AzureRmAccount `
     -ServicePrincipal `
@@ -46,8 +46,6 @@ catch {
 
 #---------Start Virtual Machines---------------
 Write-Output "Retrieving App Service Plans..."
-
-
 $plans = Get-AzureRmAppServicePlan -ResourceGroupName $resourceGroupName
 
 if (!$plans) {
@@ -58,10 +56,8 @@ else {
     $name = $_.Name
     Write-Output "Scaling Down $name"
     Set-AzureRmAppServicePlan -Name $name `
-        -ResourceGroupName $resourceGroupName
-        -Tier "Free"
-        -workersize "Small"
+        -ResourceGroupName $resourceGroupName `
+        -Tier $sku `
+        -Workersize $size
   }
 }
-
-
