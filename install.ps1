@@ -64,4 +64,14 @@ if ($DevOps -eq $true) {
   Write-Host "---------------------------------------------" -ForegroundColor "blue"
 }
 
+if($IaaS -eq $true) {
+  Write-Host "Install IaaS Resources here we go...." -foregroundcolor "cyan"
+
+  & ./iac-publicVM/install.ps1 -ResourceGroupName iaas -DomainJoin $true
+
+  Write-Host "---------------------------------------------" -ForegroundColor "blue"
+  Write-Host "Devops Components have been installed!!!!!" -foregroundcolor "red"
+  Write-Host "---------------------------------------------" -ForegroundColor "blue"
+}
+
 

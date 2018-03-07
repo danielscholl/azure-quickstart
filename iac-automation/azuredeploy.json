@@ -250,6 +250,13 @@
         "description": "Runbook to reset Azure AD Passwords",
         "type": "PowerShell",
         "Id": ""
+      },
+      "scaleappplan": {
+        "name": "scale-appplan",
+        "version": "1.0.0.0",
+        "description": "Runbook to scale app service Plan",
+        "type": "PowerShell",
+        "Id": ""
       }
     },
     "configurations": {
@@ -961,6 +968,29 @@
             "publishContentLink": {
               "uri": "[concat(variables('assetLocation'),'/runbooks/password-reset.ps1',parameters('runbookSasToken'))]",
               "version": "[variables('runbooks').passwordreset.version]"
+            }
+          }
+        },
+        {
+          "name": "[variables('runbooks').scaleappplan.name]",
+          "type": "runbooks",
+          "apiVersion": "2015-10-31",
+          "location": "[parameters('automationRegion')]",
+          "dependsOn": [
+            "[concat('Microsoft.Automation/automationAccounts/', variables('automationAccountName'))]",
+            "[concat('Microsoft.Automation/automationAccounts/', variables('automationAccountName'), '/Modules/', variables('psModules').azureRmProfile.name)]",
+            "[concat('Microsoft.Automation/automationAccounts/', variables('automationAccountName'), '/Modules/', variables('psModules').azureRmCompute.name)]",
+            "[concat('Microsoft.Automation/automationAccounts/', variables('automationAccountName'), '/Modules/', variables('psModules').azureRmAutomation.name)]"
+          ],
+          "tags": {},
+          "properties": {
+            "runbookType": "[variables('runbooks').scaleappplan.type]",
+            "logProgress": "false",
+            "logVerbose": "false",
+            "description": "[variables('runbooks').scaleappplan.description]",
+            "publishContentLink": {
+              "uri": "[concat(variables('assetLocation'),'/runbooks/scale-appplan.ps1',parameters('runbookSasToken'))]",
+              "version": "[variables('runbooks').scaleappplan.version]"
             }
           }
         },
