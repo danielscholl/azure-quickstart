@@ -1,0 +1,6 @@
+{
+  "fileUris": [
+    "https://raw.githubusercontent.com/danielscholl/azure-quickstart/master/ext-customScript/installWinDeploy.ps1"
+  ],
+  "commandToExecute": "powershell.exe ./installWinDeploy.ps1"
+}
