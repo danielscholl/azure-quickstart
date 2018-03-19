@@ -8,7 +8,7 @@
         "description": "Small unique string."
       },
       "minLength": 2,
-      "maxLength": 7
+      "maxLength": 10
     },
     "vnetGroup": {
       "type": "string",
@@ -105,8 +105,11 @@
     "labName": "[concat(parameters('prefix'), '-lab')]",
     "vnetID": "[resourceId(parameters('vnetGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnet'))]",
     "subnetID": "[concat(variables('vnetID'), '/subnets/', parameters('subnet'))]",
+    "labVirtualNetworkName": "common-vnet",
+    "labvnetID": "[resourceId('Microsoft.DevTestLab/labs/virtualnetworks', variables('labName'), variables('labVirtualNetworkName'))]",
     "userMaxVmsAllowed": "5",
-    "labMaxVmsAllowed": "10"
+    "labMaxVmsAllowed": "10",
+    "vmName": "[concat(variables('labName'), '/', parameters('vmName'))]"
   },
   "resources": [
     {
@@ -198,6 +201,41 @@
           "status": "Enabled"
         }
       }]
+    },
+    {
+      "apiVersion": "2017-04-26-preview",
+      "type": "Microsoft.DevTestLab/labs/virtualmachines",
+      "name": "[variables('vmName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "notes": "Visual Studio Community 2017 on Windows 10 Enterprise N (x64)",
+        "galleryImageReference": {
+          "offer": "VisualStudio",
+          "publisher": "MicrosoftVisualStudio",
+          "sku": "VS-2017-Comm-Win10-N",
+          "osType": "Windows",
+          "version": "latest"
+        },
+        "size": "[parameters('vmSize')]",
+        "userName": "[parameters('userName')]",
+        "password": "[parameters('password')]",
+        "artifacts": [{
+            "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', variables('labName'), 'public repo', 'windows-vscode')]"
+          },
+          {
+            "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', variables('labName'), 'public repo', 'windows-git')]"
+          },
+          {
+            "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', variables('labName'), 'public repo', 'windows-chrome')]"
+          }
+        ],
+        "isAuthenticationWithSshKey": false,
+        "labVirtualNetworkId": "[variables('labvnetID')]",
+        "labSubnetName": "[parameters('subnet')]",
+        "disallowPublicIpAddress": false,
+        "storageType": "Premium",
+        "allowClaim": false
+      }
     }
   ],
   "outputs": {
@@ -206,6 +244,10 @@
       "value": {
         "id": "[resourceId('Microsoft.DevTestLab/labs', variables('labName'))]"
       }
+    },
+    "vm": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.DevTestLab/labs/virtualMachines', variables('labName'), 'virtualMachines', variables('vmName'))]"
     }
   }
 }
