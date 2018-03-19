@@ -10,6 +10,65 @@
       "minLength": 2,
       "maxLength": 7
     },
+    "vnetGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing VNET resource group"
+      }
+    },
+    "vnet": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing VNET"
+      }
+    },
+    "subnet": {
+      "type": "string",
+      "metadata": {
+        "description": "Subnet ID to associate VM to."
+      }
+    },
+    "artifactRepoUri": {
+      "type": "string",
+      "defaultValue": "https://github.com/danielscholl/azure-quickstart.git",
+      "metadata": {
+        "description": "Set 'artifact repository': the Git clone URI."
+      }
+    },
+    "artifactRepoFolder": {
+      "type": "string",
+      "defaultValue": "iac-devtestlab/Artifacts",
+      "metadata": {
+        "description": "Set 'artifact repository': the target folder in the repo."
+      }
+    },
+    "artifactRepoBranch": {
+      "type": "string",
+      "defaultValue": "master",
+      "metadata": {
+        "description": "Set 'artifact repository': the target branch in the repo."
+      }
+    },
+    "artifactRepoDisplayName": {
+      "type": "string",
+      "defaultValue": "PrivateRepo",
+      "metadata": {
+        "description": "Set 'artifact repository': the display name of the repo."
+      }
+    },
+    "artifactRepoSecurityToken": {
+      "type": "string",
+      "metadata": {
+        "description": "Set 'artifact repository': the personal access token of the repo."
+      }
+    },
+    "artifactRepoType": {
+      "type": "string",
+      "defaultValue": "GitHub",
+      "metadata": {
+        "description": "Set 'artifact repository': the Git repo type, GitHub or VSTS."
+      }
+    },
     "vmName": {
       "type": "string",
       "defaultValue": "vm1"
@@ -24,76 +83,121 @@
     },
     "password": {
       "type": "securestring"
+    },
+    "timeZoneId": {
+      "type": "string",
+      "defaultValue": "UTC",
+      "metadata": {
+        "description": "The timezone of the lab."
+      }
+    },
+    "labVmShutDownTime": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 5,
+      "defaultValue": "19:00",
+      "metadata": {
+        "description": "Set 'Auto Shutdown' policy: The UTC time at which the Lab VMs will be automatically shutdown (E.g. 17:30, 20:00, 09:00)."
+      }
     }
   },
   "variables": {
     "labName": "[concat(parameters('prefix'), '-lab')]",
-    "vnetName": "[concat(variables('labName'), '-vnet')]",
-    "labSubnetName": "[concat(variables('vnetName'), 'Subnet')]",
-    "labVirtualNetworkId": "[resourceId('Microsoft.DevTestLab/labs/virtualnetworks', variables('labName'), variables('vnetName'))]",
-    "vmId": "[resourceId ('Microsoft.DevTestLab/labs/virtualmachines', variables('labName'), parameters('vmName'))]",
-    "vmName": "[concat(variables('labName'), '/', parameters('vmName'))]"
+    "vnetID": "[resourceId(parameters('vnetGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnet'))]",
+    "subnetID": "[concat(variables('vnetID'), '/subnets/', parameters('subnet'))]",
+    "userMaxVmsAllowed": "5",
+    "labMaxVmsAllowed": "10"
   },
-  "resources": [{
+  "resources": [
+    {
       "name": "[variables('labName')]",
       "type": "Microsoft.DevTestLab/labs",
-      "apiVersion": "2017-04-26-preview",
+      "apiVersion": "2016-05-15",
       "location": "[resourceGroup().location]",
+      "properties": { },
       "resources": [{
-        "apiVersion": "2017-04-26-preview",
-        "name": "[variables('vnetName')]",
-        "type": "virtualNetworks",
+        "apiVersion": "2016-05-15",
+        "name": "[parameters('vnet')]",
+        "type": "virtualnetworks",
         "dependsOn": [
           "[resourceId('Microsoft.DevTestLab/labs', variables('labName'))]"
-        ]
-      }]
-    },
-    {
-      "name": "[variables('vmName')]",
-      "type": "Microsoft.DevTestLab/labs/virtualmachines",
-      "apiVersion": "2017-04-26-preview",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[variables('labVirtualNetworkId')]"
-      ],
-      "properties": {
-        "galleryImageReference": {
-          "offer": "VisualStudio",
-          "publisher": "MicrosoftVisualStudio",
-          "sku": "VS-2017-Ent-Latest-Win10-N",
-          "osType": "Windows",
-          "version": "latest"
-        },
-        "size": "[parameters('vmSize')]",
-        "storageType": "Premium",
-        "isAuthenticationWithSshKey": false,
-        "sshKey": "",
-        "userName": "[parameters('userName')]",
-        "password": "[parameters('password')]",
-        "labVirtualNetworkId": "[variables('labVirtualNetworkId')]",
-        "labSubnetName": "[variables('labSubnetName')]",
-        "notes": "Visual Studio Enterprise 2017 (latest release) on Windows 10 Enterprise N (x64)",
-        "artifacts": [{
-            "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', variables('labName'), 'public repo', 'windows-vscode')]"
-          },
-          {
-            "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', variables('labName'), 'public repo', 'windows-git')]"
-          },
-          {
-            "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', variables('labName'), 'public repo', 'windows-chrome')]"
-          }
         ],
-        "disallowPublicIpAddress": true,
-        "allowClaim": false,
-        "networkInterface": {
-          "sharedPublicIpAddressConfiguration": {
-            "inboundNatRules": [{
-              "transportProtocol": "tcp",
-              "backendPort": 3389
-            }]
+        "properties": {
+          "description": "Existing Virtual Network",
+          "externalProviderResourceId": "[variables('vnetID')]",
+          "subnetOverrides": [
+            {
+              "name": "[parameters('subnet')]",
+              "resourceId": "[variables('subnetId')]",
+              "useInVmCreationPermission": "Allow",
+              "usePublicIpAddressPermission": "Allow"
+            }
+          ]
+         }
+      },
+      {
+        "apiVersion": "2016-05-15",
+        "name": "LabVmsShutdown",
+        "type": "schedules",
+        "dependsOn": [
+          "[resourceId('Microsoft.DevTestLab/labs', variables('labName'))]"
+        ],
+        "properties": {
+          "status": "Enabled",
+          "timeZoneId": "[parameters('timeZoneId')]",
+          "taskType": "LabVmsShutdownTask",
+          "dailyRecurrence": {
+              "time": "[replace(parameters('labVmShutDownTime'),':','')]"
           }
         }
-      }
+      },
+      {
+        "apiVersion": "2016-05-15",
+        "name": "default/MaxVmsAllowedPerUser",
+        "type": "policysets/policies",
+        "dependsOn": [
+          "[resourceId('Microsoft.DevTestLab/labs', variables('labName'))]"
+        ],
+        "properties": {
+          "description": "",
+          "factName": "UserOwnedLabVmCount",
+          "threshold": "[string(variables('userMaxVmsAllowed'))]",
+          "evaluatorType": "MaxValuePolicy",
+          "status": "enabled"
+        }
+      },
+      {
+        "apiVersion": "2016-05-15",
+        "name": "default/MaxVmsAllowedPerLab",
+        "type": "policysets/policies",
+        "dependsOn": [
+          "[resourceId('Microsoft.DevTestLab/labs', variables('labName'))]"
+        ],
+        "properties": {
+          "description": "Applied Policy for Lab Size",
+          "factName": "LabVmCount",
+          "threshold": "[string(variables('labMaxVmsAllowed'))]",
+          "evaluatorType": "MaxValuePolicy",
+          "status": "enabled"
+        }
+      },
+      {
+        "apiVersion": "2016-05-15",
+        "name": "privateRepo",
+        "type": "artifactsources",
+        "dependsOn": [
+          "[resourceId('Microsoft.DevTestLab/labs', variables('labName'))]"
+        ],
+        "properties": {
+          "uri": "[parameters('artifactRepoUri')]",
+          "folderPath": "[parameters('artifactRepoFolder')]",
+          "branchRef": "[parameters('artifactRepoBranch')]",
+          "displayName": "[parameters('artifactRepoDisplayName')]",
+          "securityToken": "[parameters('artifactRepoSecurityToken')]",
+          "sourceType": "[parameters('artifactRepoType')]",
+          "status": "Enabled"
+        }
+      }]
     }
   ],
   "outputs": {
@@ -101,12 +205,6 @@
       "type": "object",
       "value": {
         "id": "[resourceId('Microsoft.DevTestLab/labs', variables('labName'))]"
-      }
-    },
-    "labVM": {
-      "type": "object",
-      "value": {
-        "id": "[variables('vmId')]"
       }
     }
   }

@@ -5,6 +5,9 @@
     "prefix": {
       "value": "my"
     },
+    "subnet": {
+      "value": "front_subnet"
+    },
     "vmName": {
       "value": "vm1"
     },
