@@ -1,0 +1,90 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "prefix": {
+        "type": "string",
+        "metadata": {
+          "description": "Small unique string."
+        },
+        "minLength": 2,
+        "maxLength": 10
+      },
+      "subnet": {
+        "type": "string",
+        "metadata": {
+          "description": "Subnet ID to associate VM to."
+        }
+      },
+      "vmName": {
+        "type": "string",
+        "defaultValue": "vm1"
+      },
+      "vmSize": {
+        "type": "string",
+        "defaultValue": "Standard_DS1_v2"
+      },
+      "userName": {
+        "type": "string",
+        "defaultValue": "azureuser"
+      },
+      "password": {
+        "type": "securestring"
+      }
+    },
+    "variables": {
+      "labName": "[concat(parameters('prefix'), '-lab')]",
+      "labVirtualNetworkName": "common-vnet",
+      "labvnetID": "[resourceId('Microsoft.DevTestLab/labs/virtualnetworks', variables('labName'), variables('labVirtualNetworkName'))]",
+      "vmName": "[concat(variables('labName'), '/', parameters('vmName'))]"
+    },
+    "resources": [
+      {
+        "apiVersion": "2017-04-26-preview",
+        "type": "Microsoft.DevTestLab/labs/virtualmachines",
+        "name": "[variables('vmName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "notes": "Visual Studio Community 2017 on Windows 10 Enterprise N (x64)",
+          "galleryImageReference": {
+            "offer": "VisualStudio",
+            "publisher": "MicrosoftVisualStudio",
+            "sku": "VS-2017-Comm-Win10-N",
+            "osType": "Windows",
+            "version": "latest"
+          },
+          "size": "[parameters('vmSize')]",
+          "userName": "[parameters('userName')]",
+          "password": "[parameters('password')]",
+          "artifacts": [{
+              "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', variables('labName'), 'public repo', 'windows-vscode')]"
+            },
+            {
+              "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', variables('labName'), 'public repo', 'windows-git')]"
+            },
+            {
+              "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', variables('labName'), 'public repo', 'windows-chrome')]"
+            }
+          ],
+          "isAuthenticationWithSshKey": false,
+          "labVirtualNetworkId": "[variables('labvnetID')]",
+          "labSubnetName": "[parameters('subnet')]",
+          "disallowPublicIpAddress": false,
+          "storageType": "Premium",
+          "allowClaim": false
+        }
+      }
+    ],
+    "outputs": {
+      "lab": {
+        "type": "object",
+        "value": {
+          "id": "[resourceId('Microsoft.DevTestLab/labs', variables('labName'))]"
+        }
+      },
+      "vm": {
+        "type": "string",
+        "value": "[resourceId('Microsoft.DevTestLab/labs/virtualMachines', variables('labName'), 'virtualMachines', variables('vmName'))]"
+      }
+    }
+  }

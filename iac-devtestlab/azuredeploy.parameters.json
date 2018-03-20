@@ -7,15 +7,6 @@
     },
     "subnet": {
       "value": "front_subnet"
-    },
-    "vmName": {
-      "value": "vm1"
-    },
-    "vmSize": {
-      "value": "Standard_DS1_v2"
-    },
-    "userName": {
-      "value": "azureuser"
     }
   }
 }
