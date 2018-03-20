@@ -17,7 +17,9 @@ Param(
   [string]$CommonResourceGroup = "common",
   [string]$DevopsGroup = "devops",
   [string]$Location = $env:AZURE_LOCATION,
-  [string]$GithubToken = $env:GITHUB_TOKEN
+  [string]$GithubToken = $env:GITHUB_TOKEN,
+  [Parameter(Mandatory=$true, Position=0, HelpMessage="Password?")]
+  [SecureString]$password
 )
 
 if (Test-Path ..\scripts\functions.ps1) { . ..\scripts\functions.ps1 }
@@ -59,3 +61,10 @@ New-AzureRmResourceGroupDeployment -Name $DEPLOYMENT `
   -vnetGroup $CommonResourceGroup -vnet $VirtualNetworkName `
   -artifactRepoSecurityToken $GithubToken `
   -ResourceGroupName $ResourceGroupName
+
+$pw = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))
+$LabName = $(az resource list -g devtest --query "[?type=='Microsoft.DevTestLab/labs'].name" -otsv)
+  az lab secret set --lab-name $LabName `
+  --resource-group $ResourceGroupName `
+  --name password `
+  --value $pw
