@@ -1,0 +1,29 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "prefix": {
+        "type": "string",
+        "metadata": {
+          "description": "Small unique string."
+        }
+      }
+    },
+    "variables": {
+        "cleanUnique": "[toLower(replace(parameters('prefix'),'-', ''))]",
+        "databaseAccountName": "[concat(variables('cleanUnique'), uniqueString(resourceGroup().id))]"
+    },
+    "resources": [
+      {
+        "apiVersion": "2015-04-08",
+        "type": "Microsoft.DocumentDB/databaseAccounts",
+        "kind": "MongoDB",
+        "name": "[variables('databaseAccountName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "databaseAccountOfferType": "Standard",
+          "name": "[variables('databaseAccountName')]"
+        }
+      }
+    ]
+  }
