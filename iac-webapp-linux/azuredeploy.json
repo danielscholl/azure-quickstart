@@ -1,0 +1,55 @@
+{  
+   "$schema":"http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+   "contentVersion":"1.0.0.0",
+   "parameters":{
+    "prefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Small unique string."
+      },
+      "minLength": 2,
+      "maxLength": 11
+    }
+   },
+   "variables":{  
+      "hostingPlanName":"[concat(parameters('prefix'), '-linux-plan')]",
+      "siteName": "[concat(parameters('prefix'), '-linux-web')]"
+   },
+   "resources":[  
+      {  
+         "type":"Microsoft.Web/sites",
+         "name":"[variables('siteName')]",
+         "dependsOn":[  
+            "[variables('hostingPlanName')]"
+         ],
+         "properties":{  
+            "siteConfig":{  
+               "linuxFxVersion":"node|6.10"
+            },
+            "name":"[variables('siteName')]",
+            "serverFarmId":"[variables('hostingPlanName')]",
+            "hostingEnvironment":""
+         },
+         "apiVersion":"2016-03-01",
+         "location":"[resourceGroup().location]"
+      },
+      {  
+         "apiVersion":"2016-09-01",
+         "name":"[variables('hostingPlanName')]",
+         "type":"Microsoft.Web/serverfarms",
+         "location":"[resourceGroup().location]",
+         "properties":{  
+            "name":"[variables('hostingPlanName')]",
+            "workerSizeId":"1",
+            "reserved":true,
+            "numberOfWorkers":"1",
+            "hostingEnvironment":""
+         },
+         "sku":{  
+            "Tier":"Standard",
+            "Name":"S1"
+         },
+         "kind":"linux"
+      }
+   ]
+}
