@@ -1,0 +1,140 @@
+{
+    "apiVersion": "2017-04-26-preview",
+    "type": "Microsoft.DevTestLab/labs/virtualmachines",
+    "name": "[concat(parameters('newLabName'), '/', parameters('pilotVMName'))]",
+    "location": "[resourceGroup().location]",
+    "dependsOn": [
+      "[variables('labVirtualNetworkId')]"
+    ],
+    "properties": {
+      "galleryImageReference": {
+        "offer": "WindowsServer",
+        "publisher": "MicrosoftWindowsServer",
+        "sku": "2012-R2-Datacenter",
+        "osType": "Windows",
+        "version": "latest"
+      },
+      "size": "[parameters('VMSize')]",
+      "storageType": "[parameters('VMStorageType')]",
+      "isAuthenticationWithSshKey": false,
+      "userName": "[parameters('username')]",
+      "sshKey": "",
+      "password": "[parameters('password')]",
+      "labVirtualNetworkId": "[variables('labVirtualNetworkId')]",
+      "labSubnetName": "[variables('labSubnetName')]"
+    }
+  },
+  {
+    "apiVersion": "2017-04-26-preview",
+    "name": "[variables('devTemplateResourceName')]",
+    "type": "Microsoft.DevTestLab/labs/customimages",
+    "dependsOn": [
+      "[resourceId('Microsoft.DevTestLab/labs/virtualMachines', parameters('newLabName'), parameters('pilotVMName'))]"
+    ],
+    "properties": {
+      "vm": {
+        "sourceVmId": "[resourceId('Microsoft.DevTestLab/labs/virtualMachines', parameters('newLabName'), parameters('pilotVMName'))]",
+        "windowsOsInfo": {
+          "windowsOsState": "NonSysprepped"
+        }
+      },
+      "description": "[parameters('devBoxTemplateDescription')]"
+    }
+  },
+  {
+    "apiVersion": "2017-04-26-preview",
+    "name": "[variables('testTemplateResourceName')]",
+    "type": "Microsoft.DevTestLab/labs/customimages",
+    "dependsOn": [
+      "[resourceId('Microsoft.DevTestLab/labs/customimages', parameters('newLabName'), parameters('devBoxTemplateName'))]"
+    ],
+    "properties": {
+      "vm": {
+        "sourceVmId": "[resourceId('Microsoft.DevTestLab/labs/virtualMachines', parameters('newLabName'), parameters('pilotVMName'))]",
+        "windowsOsInfo": {
+          "windowsOsState": "NonSysprepped"
+        }
+      },
+      "description": "[parameters('testBoxTemplateDescription')]"
+    }
+  },
+  {
+    "apiVersion": "2017-04-26-preview",
+    "name": "[variables('goldenImageTemplateResourceName')]",
+    "type": "Microsoft.DevTestLab/labs/customimages",
+    "dependsOn": [
+      "[resourceId('Microsoft.DevTestLab/labs/customimages', parameters('newLabName'), parameters('testBoxTemplateName'))]"
+    ],
+    "properties": {
+      "vm": {
+        "sourceVmId": "[resourceId('Microsoft.DevTestLab/labs/virtualMachines', parameters('newLabName'), parameters('pilotVMName'))]",
+        "windowsOsInfo": {
+          "windowsOsState": "NonSysprepped"
+        }
+      },
+      "description": "[parameters('goldenImageTemplateDescription')]"
+    }
+  },
+  {
+    "apiVersion": "2017-04-26-preview",
+    "type": "Microsoft.DevTestLab/labs/virtualmachines",
+    "name": "[concat(parameters('newLabName'), '/', parameters('devBoxVMName'))]",
+    "location": "[resourceGroup().location]",
+    "dependsOn": [
+      "[variables('devVmTemplateId')]",
+      "[variables('labVirtualNetworkId')]"
+    ],
+    "properties": {
+      "customImageId": "[variables('devVmTemplateId')]",
+      "storageType": "[parameters('VMStorageType')]",
+      "size": "[parameters('VMSize')]",
+      "isAuthenticationWithSshKey": false,
+      "userName": "[parameters('userName')]",
+      "sshKey": "",
+      "password": "[parameters('password')]",
+      "labVirtualNetworkId": "[variables('labVirtualNetworkId')]",
+      "labSubnetName": "[variables('labSubnetName')]"
+    }
+  },
+  {
+    "apiVersion": "2017-04-26-preview",
+    "type": "Microsoft.DevTestLab/labs/virtualmachines",
+    "name": "[concat(parameters('newLabName'), '/', parameters('testBoxVMName'))]",
+    "location": "[resourceGroup().location]",
+    "dependsOn": [
+      "[variables('testVmTemplateId')]",
+      "[variables('labVirtualNetworkId')]"
+    ],
+    "properties": {
+      "customImageId": "[variables('testVmTemplateId')]",
+      "size": "[parameters('VMSize')]",
+      "storageType": "[parameters('VMStorageType')]",
+      "isAuthenticationWithSshKey": false,
+      "userName": "[parameters('userName')]",
+      "sshKey": "",
+      "password": "[parameters('password')]",
+      "labVirtualNetworkId": "[variables('labVirtualNetworkId')]",
+      "labSubnetName": "[variables('labSubnetName')]"
+    }
+  },
+  {
+    "apiVersion": "2017-04-26-preview",
+    "type": "Microsoft.DevTestLab/labs/virtualmachines",
+    "name": "[concat(parameters('newLabName'), '/', parameters('goldenImageVMName'))]",
+    "location": "[resourceGroup().location]",
+    "dependsOn": [
+      "[variables('goldenImageTemplateId')]",
+      "[variables('labVirtualNetworkId')]"
+    ],
+    "properties": {
+      "customImageId": "[variables('goldenImageTemplateId')]",
+      "size": "[parameters('VMSize')]",
+      "storageType": "[parameters('VMStorageType')]",
+      "isAuthenticationWithSshKey": false,
+      "userName": "[parameters('userName')]",
+      "sshKey": "",
+      "password": "[parameters('password')]",
+      "labVirtualNetworkId": "[variables('labVirtualNetworkId')]",
+      "labSubnetName": "[variables('labSubnetName')]"
+    }
+  }

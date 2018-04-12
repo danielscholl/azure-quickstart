@@ -1,0 +1,30 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "newLabName": {
+        "value": "CloudCodeItLab"
+      },
+      "labVmShutDownTime": {
+        "value": "19:00"
+      },
+      "maxAllowedVmsPerUser": {
+        "value": 5
+      },
+      "maxAllowedVmsPerLab": {
+        "value": 10
+      },
+      "allowedVmSizes": {
+        "value": "\"Standard_DS1_v2\", \"Standard_DS2_v2\", \"Standard_DS3_v2\""
+      },
+      "artifactRepoFolder": {
+          "value": "lab-demo/Artifacts"
+      },
+      "artifactRepoBranch": {
+          "value": "master"
+      },
+      "artifactRepoDisplayName": {
+          "value": "CloudCodeitRepo"
+      }
+    }
+  }

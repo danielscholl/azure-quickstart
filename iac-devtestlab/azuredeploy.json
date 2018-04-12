@@ -44,7 +44,7 @@
     },
     "templateRepoFolder": {
       "type": "string",
-      "defaultValue": "/iac-devtestlab/Templates",
+      "defaultValue": "/iaas",
       "metadata": {
         "description": "Set 'template repository': the target folder in the repo."
       }

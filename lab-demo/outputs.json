@@ -1,0 +1,36 @@
+{
+    "outputs": {
+        "labId": {
+          "type": "string",
+          "value": "[resourceId('Microsoft.DevTestLab/labs', parameters('newLabName'))]"
+        },
+        "pilotVmId": {
+          "type": "string",
+          "value": "[resourceId('Microsoft.DevTestLab/labs/virtualMachines', parameters('newLabName'), parameters('pilotVMName'))]"
+        },
+        "devVmTemplateId": {
+          "type": "string",
+          "value": "[variables('devVmTemplateId')]"
+        },
+        "testVmTemplateId": {
+          "type": "string",
+          "value": "[variables('testVmTemplateId')]"
+        },
+        "goldenImageVmTemplateId": {
+          "type": "string",
+          "value": "[variables('goldenImageTemplateId')]"
+        },
+        "devVmId": {
+          "type": "string",
+          "value": "[resourceId('Microsoft.DevTestLab/labs/virtualMachines', parameters('newLabName'), parameters('devBoxVMName'))]"
+        },
+        "testVmId": {
+          "type": "string",
+          "value": "[resourceId('Microsoft.DevTestLab/labs/virtualMachines', parameters('newLabName'), parameters('testBoxVMName'))]"
+        },
+        "goldenImageVmId": {
+          "type": "string",
+          "value": "[resourceId('Microsoft.DevTestLab/labs/virtualMachines', parameters('newLabName'), parameters('goldenImageVMName'))]"
+        }
+      }
+}
