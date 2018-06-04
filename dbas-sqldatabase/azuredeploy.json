@@ -23,7 +23,7 @@
   },
   "variables": {
     "sqlserverName": "[concat('sqlserver', uniqueString(resourceGroup().id))]",
-    "databaseName": "horizon_16.123.3.1",
+    "databaseName": "db",
     "storageKeyType": "SharedAccessKey"
   },
   "resources": [{
