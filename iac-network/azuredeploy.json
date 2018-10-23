@@ -65,11 +65,12 @@
     "Nsg1Name": "[concat(variables('Subnet2Name'), '-nsg')]",
     "Nsg2Name": "[concat(variables('Subnet3Name'), '-nsg')]"
   },
-  "resources": [{
+  "resources": [
+    {
       "comments": "## Network Security Group ##",
       "name": "[variables('nsg1Name')]",
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2018-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "Network Security Group - dmz"
@@ -82,7 +83,7 @@
       "comments": "## Network Security Group ##",
       "name": "[variables('nsg2Name')]",
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2018-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "Network Security Group - Manage"
@@ -110,7 +111,8 @@
             "[parameters('VNetPrefix')]"
           ]
         },
-        "subnets": [{
+        "subnets": [
+          {
             "name": "[variables('Subnet1Name')]",
             "properties": {
               "addressPrefix": "[parameters('Subnet1Prefix')]"

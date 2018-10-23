@@ -15,10 +15,7 @@ Param(
   [string] $Subscription = $env:AZURE_SUBSCRIPTION,
   [string] $ResourceGroupName = $env:AZURE_IAAS_GROUP,
   [string] $CommonResourceGroup = $env:AZURE_COMMON_GROUP,
-  [string] $Location = $env:AZURE_LOCATION,
-  [boolean] $DomainJoin = $false,
-  [string] $Image = $false,
-  [string] $ImageName = ""
+  [string] $Location = $env:AZURE_LOCATION
 )
 
 if (Test-Path ..\scripts\functions.ps1) { . ..\scripts\functions.ps1 }

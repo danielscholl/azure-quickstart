@@ -88,7 +88,7 @@
       "comments": "## Network Security Group ##",
       "name": "[concat(variables('NsgName'))]",
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2018-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Company": "[parameters('prefix')]"
@@ -116,7 +116,7 @@
       "comments": "## Public IP Address ##",
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[variables('PublicIpName')]",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2018-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Company": "[parameters('prefix')]"
@@ -129,7 +129,7 @@
       "comments": "## Network Interface ##",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[variables('NicName')]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2018-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Company": "[parameters('prefix')]"
@@ -168,7 +168,7 @@
       "comments": "## Virtual Machine ##",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[variables('vmName')]",
-      "apiVersion": "2016-04-30-preview",
+      "apiVersion": "2018-06-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Company": "[parameters('prefix')]"

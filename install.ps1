@@ -58,8 +58,8 @@ if ($Base -eq $true) {
 if ($DevOps -eq $true) {
   Write-Host "Install DevOps Resources here we go...." -foregroundcolor "cyan"
 
-  & ./iac-storage/install.ps1 -ResourceGroupName devops
-  & ./iac-automation/install.ps1 -ResourceGroupName devops
+#  & ./iac-storage/install.ps1 -ResourceGroupName $Env:AZURE_DEVOPS_GROUP
+  & ./iac-automation/install.ps1 -ResourceGroupName $Env:AZURE_DEVOPS_GROUP
 
   Write-Host "---------------------------------------------" -ForegroundColor "blue"
   Write-Host "Devops Components have been installed!!!!!" -foregroundcolor "red"
@@ -69,7 +69,8 @@ if ($DevOps -eq $true) {
 if($Server -eq $true) {
   Write-Host "Install IaaS Resources here we go...." -foregroundcolor "cyan"
 
-  & ./iac-publicVM/install.ps1 -ResourceGroupName iaas -DomainJoin $true
+  & ./iac-publicVM-linux/install.ps1 -ResourceGroupName $Env:AZURE_IAAS_GROUP
+#  & ./iac-publicVM-windows/install.ps1 -ResourceGroupName iaas -DomainJoin $false
 
   Write-Host "---------------------------------------------" -ForegroundColor "blue"
   Write-Host "Devops Components have been installed!!!!!" -foregroundcolor "red"

@@ -8,8 +8,8 @@
   Version History
   v1.0   - Initial Release
 #>
-#Requires -Version 5.1
-#Requires -Module @{ModuleName='AzureRM.Resources'; ModuleVersion='5.0'}
+#Requires -Version 6.1.0
+#Requires -Module @{ModuleName='Az.Resources'; ModuleVersion='0.3.0'}
 
 Param(
   [string] $Subscription = $env:AZURE_SUBSCRIPTION,
@@ -33,7 +33,7 @@ LoginAzure
 CreateResourceGroup $ResourceGroupName $Location
 
 Write-Color -Text "Registering Provider..." -Color Yellow
-Register-AzureRmResourceProvider -ProviderNamespace Microsoft.Automation
+Register-AzResourceProvider -ProviderNamespace Microsoft.Automation
 
 
 Write-Color -Text "Retrieving Storage Account Information..." -Color Green
@@ -52,7 +52,7 @@ Create-Container $ResourceGroupName $DIRECTORY
 
 $files = @(Get-ChildItem $BASE_DIR\$DIRECTORY)
 foreach ($file in $files) {
-  Upload-File $ResourceGroupName $DIRECTORY $BASE_DIR\$DIRECTORY\$file
+  Upload-File $ResourceGroupName $DIRECTORY $file
 }
 
 ##############################
@@ -68,7 +68,7 @@ Create-Container $ResourceGroupName $DIRECTORY
 
 $files = @(Get-ChildItem $BASE_DIR\$DIRECTORY)
 foreach ($file in $files) {
-  Upload-File $ResourceGroupName $DIRECTORY $BASE_DIR\$DIRECTORY\$file
+  Upload-File $ResourceGroupName $DIRECTORY $file
 }
 
 Write-Color -Text "Retrieving Storage Account SAS Tokens..." -Color Green
@@ -86,11 +86,11 @@ Write-Color -Text "$DscToken" -Color White
 Write-Color -Text "`r`n---------------------------------------------------- "-Color Yellow
 Write-Color -Text "Deploying ", "$DEPLOYMENT ", "template..." -Color Green, Red, Green
 Write-Color -Text "---------------------------------------------------- "-Color Yellow
-New-AzureRmResourceGroupDeployment -Name $DEPLOYMENT `
+New-AzResourceGroupDeployment -Name $DEPLOYMENT `
   -TemplateFile $BASE_DIR\azuredeploy.json `
   -TemplateParameterFile $BASE_DIR\azuredeploy.parameters.json `
   -prefix $ResourceGroupName -storageAccountName $StorageAccountName `
-  -subscriptionAdmin $(Get-AzureRmContext).Account.Id -domainAdmin "domain_joiner"  `
+  -subscriptionAdmin $(Get-AzContext).Account.Id -domainAdmin "domain_joiner"  `
   -runbookSasToken $RunBookToken -dscSasToken $DscToken `
   -jobGuid1 (New-Guid).Guid -jobGuid2 (New-Guid).Guid -jobGuid3 (New-Guid).Guid `
   -ResourceGroupName $ResourceGroupName

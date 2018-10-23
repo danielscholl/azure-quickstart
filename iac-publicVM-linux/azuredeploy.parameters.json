@@ -15,7 +15,7 @@
       "value": "front_subnet"
     },
     "vmName": {
-      "value": "jump"
+      "value": "jump-linux"
     },
     "vmSize": {
       "value": "Standard_DS1_v2"
