@@ -8,19 +8,23 @@
         "description": "Small unique string."
       }
     },
-    "vnetPrefix": {
+    "vnetGroup": {
       "type": "string",
       "metadata": {
-        "description": "Virtual Network Address Prefix CIDR"
-      },
-      "defaultValue": "10.0.0.0/16"
+        "description": "Name of the existing VNET resource group"
+      }
     },
-    "subnetPrefix": {
+    "vnet": {
       "type": "string",
       "metadata": {
-        "description": "Subnet 1 Address Prefix CIDR"
-      },
-      "defaultValue": "10.0.0.0/24"
+        "description": "Name of the existing VNET"
+      }
+    },
+    "subnet": {
+      "type": "string",
+      "metadata": {
+        "description": "Subnet Name to associate VM to."
+      }
     },
     "adminUserName": {
       "defaultValue": "azureuser",
@@ -37,10 +41,8 @@
     }
   },
   "variables": {
-    "VNetName": "[concat(parameters('prefix'), '-vnet')]",
-    "VNetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('VNetName'))]",
-    "SubnetName": "front_subnet",
-    "SubnetId": "[concat(variables('VNetId'), '/subnets/', variables('SubnetName'))]",
+    "vnetId": "[resourceId(parameters('vnetGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnet'))]",
+    "subnetId": "[concat(variables('vnetID'),'/subnets/', parameters('subnet'))]",
     "lbName": "[concat(resourceGroup().name, '-lb')]",
     "lbId": "[resourceId('Microsoft.Network/loadBalancers',variables('lbName'))]",
     "lbIpName": "[concat(variables('lbName'), '-ip')]",
@@ -56,31 +58,6 @@
     "sshKeyPath": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]"
   },
   "resources": [
-    {
-      "comments": "## Virtual Network ##",
-      "name": "[variables('VNetName')]",
-      "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2016-03-30",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "Virtual Network"
-      },
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[parameters('VNetPrefix')]"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "[variables('SubnetName')]",
-            "properties": {
-              "addressPrefix": "[parameters('SubnetPrefix')]"
-            }
-          }
-        ]
-      }
-    },
     {
       "type": "Microsoft.Network/publicIPAddresses",
       "apiVersion": "2016-03-30",
@@ -228,22 +205,9 @@
     }
   ],
   "outputs": {
-    "virtualNetwork": {
-      "type": "object",
-      "value": {
-        "id": "[variables('VNetId')]",
-        "name": "[variables('VNetName')]"
-      }
-    },
-    "subnets": {
-      "type": "object",
-      "value": {
-        "subnet1Id": "[variables('subnetId')]"
-      }
-    },
     "SSH Targets": {
       "type": "string",
-      "value": "[concat('https://portal.azure.com', '/#resource/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('lbNatName'), '/inboundNatRules')]"
+      "value": "[concat('https://portal.azure.com', '/#resource/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('lbName'), '/inboundNatRules')]"
     }
   }
 }

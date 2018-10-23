@@ -8,12 +8,12 @@
   Version History
   v1.0   - Initial Release
 #>
-#Requires -Version 5.1
-#Requires -Module @{ModuleName='AzureRM.Resources'; ModuleVersion='5.0'}
+#Requires -Version 6.1.0
+#Requires -Module @{ModuleName='Az.Resources'; ModuleVersion='0.3.0'}
 
 Param(
   [string] $Subscription = $env:AZURE_SUBSCRIPTION,
-  [string] $ResourceGroupName,
+  [string] $ResourceGroupName = $env:AZURE_COMMON_GROUP,
   [string] $Location = $env:AZURE_LOCATION,
   [string] $servicePrincipalAppId = $env:AZURE_PRINCIPAL
 )
@@ -42,8 +42,7 @@ LoginAzure
 CreateResourceGroup $ResourceGroupName $Location
 
 Write-Color -Text "Registering Provider..." -Color Yellow
-Register-AzureRmResourceProvider -ProviderNamespace Microsoft.KeyVault
-
+Register-AzResourceProvider -ProviderNamespace Microsoft.KeyVault
 
 ##############################
 ## Deploy Template          ##
@@ -53,9 +52,9 @@ if ($servicePrincipalAppId) {
   $ID = $servicePrincipalAppId
 }
 else {
-  $ACCOUNT = $(Get-AzureRmContext).Account
+  $ACCOUNT = $(Get-AzContext).Account
   if ($ACCOUNT.Type -eq 'User') {
-    $USER = Get-AzureRmADUser -UPN $(Get-AzureRmContext).Account
+    $USER = Get-AzADUser -UPN $(Get-AzContext).Account
     $ID = $USER.Id.Guid
   }
   else {
@@ -68,7 +67,7 @@ Write-Color -Text "Key Vault Service Principal: ", "$ID" -Color Green, Red
 Write-Color -Text "`r`n---------------------------------------------------- "-Color Yellow
 Write-Color -Text "Deploying ", "$DEPLOYMENT ", "template..." -Color Green, Red, Green
 Write-Color -Text "---------------------------------------------------- "-Color Yellow
-New-AzureRmResourceGroupDeployment -Name $DEPLOYMENT `
+New-AzResourceGroupDeployment -Name $DEPLOYMENT `
   -TemplateFile $BASE_DIR\azuredeploy.json `
   -TemplateParameterFile $BASE_DIR\azuredeploy.parameters.json `
   -prefix $ResourceGroupName `

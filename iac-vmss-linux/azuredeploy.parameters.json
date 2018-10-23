@@ -4,6 +4,15 @@
   "parameters": {
     "prefix": {
       "value": "my"
+    },
+    "vnetGroup": {
+      "value": "common"
+    },
+    "vnet": {
+      "value": "common-vnet"
+    },
+    "subnet": {
+      "value": "front_subnet"
     }
   }
 }

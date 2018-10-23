@@ -8,7 +8,7 @@
         "description": "Small unique string."
       },
       "minLength": 2,
-      "maxLength": 7
+      "maxLength": 9
     },
     "servicePrincipalAppId": {
       "type": "string",
@@ -29,11 +29,17 @@
         "description": "Servers admin user account password."
       },
       "minLength": 10
+    },
+    "sshKey": {
+      "type": "string",
+      "metadata": {
+        "description": "The SSH public key used to authenticate with the created swarm. Usually available in $HOME/.ssh/id_rsa.pub file"
+      }
     }
   },
   "variables": {
     "cleanUnique": "[toLower(replace(parameters('prefix'),'-', ''))]",
-    "KeyVaultName": "[concat(variables('cleanUnique'), '-kv-' , uniqueString(resourceGroup().id))]",
+    "KeyVaultName": "[concat(variables('cleanUnique'), uniqueString(resourceGroup().id))]",
     "KeyVaultId": "[resourceId('Microsoft.KeyVault/vaults', variables('KeyVaultName'))]"
   },
   "resources": [
@@ -88,6 +94,17 @@
           "apiVersion": "2015-06-01",
           "properties": {
             "value": "[parameters('adminPassword')]"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+          ]
+        },
+        {
+          "type": "secrets",
+          "name": "sshKey",
+          "apiVersion": "2015-06-01",
+          "properties": {
+            "value": "[parameters('sshKey')]"
           },
           "dependsOn": [
             "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"

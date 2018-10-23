@@ -36,26 +36,27 @@ function Get-ScriptDirectory {
 }
 function LoginAzure() {
   Write-Color -Text "Logging in and setting subscription..." -Color Green
-  if ([string]::IsNullOrEmpty($(Get-AzureRmContext).Account)) {
-    if($env:AZURE_TENANT) {
-      Login-AzureRmAccount -TenantId $env:AZURE_TENANT
-    } else {
-      Login-AzureRmAccount
+  if ([string]::IsNullOrEmpty($(Get-AzContext).Account)) {
+    if ($env:AZURE_TENANT) {
+      Login-AzAccount -TenantId $env:AZURE_TENANT
+    }
+    else {
+      Login-AzAccount
     }
   }
-  Set-AzureRmContext -SubscriptionId ${Subscription} | Out-null
-  
+  Set-AzContext -SubscriptionId ${Subscription} | Out-null
+
 }
 function CreateResourceGroup([string]$ResourceGroupName, [string]$Location) {
   # Required Argument $1 = RESOURCE_GROUP
   # Required Argument $2 = LOCATION
 
-  Get-AzureRmResourceGroup -Name $ResourceGroupName -ev notPresent -ea 0 | Out-null
+  Get-AzResourceGroup -Name $ResourceGroupName -ev notPresent -ea 0 | Out-null
 
   if ($notPresent) {
 
     Write-Host "Creating Resource Group $ResourceGroupName..." -ForegroundColor Yellow
-    New-AzureRmResourceGroup -Name $ResourceGroupName -Location $Location
+    New-AzResourceGroup -Name $ResourceGroupName -Location $Location
   }
   else {
     Write-Color -Text "Resource Group ", "$ResourceGroupName ", "already exists." -Color Green, Red, Green
@@ -66,21 +67,21 @@ function Add-Secret ([string]$ResourceGroupName, [string]$SecretName, [securestr
   # Required Argument $2 = SECRET_NAME
   # Required Argument $3 = RESOURCE_VALUE
 
-  $KeyVault = Get-AzureRmKeyVault -ResourceGroupName $ResourceGroupName
+  $KeyVault = Get-AzKeyVault -ResourceGroupName $ResourceGroupName
   if (!$KeyVault) {
     Write-Error -Message "Key Vault in $ResourceGroupName not found. Please fix and continue"
     return
   }
 
   Write-Color -Text "Saving Secret ", "$SecretName", "..." -Color Green, Red, Green
-  Set-AzureKeyVaultSecret -VaultName $KeyVault.VaultName -Name $SecretName -SecretValue $SecretValue
+  Set-AzKeyVaultSecret -VaultName $KeyVault.VaultName -Name $SecretName -SecretValue $SecretValue
 }
 function GetStorageAccount([string]$ResourceGroupName) {
   # Required Argument $1 = RESOURCE_GROUP
 
   if ( !$ResourceGroupName) { throw "ResourceGroupName Required" }
 
-  return (Get-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName).StorageAccountName
+  return (Get-AzStorageAccount -ResourceGroupName $ResourceGroupName).StorageAccountName
 }
 
 function GetAutomationAccount([string]$ResourceGroupName) {
@@ -88,7 +89,7 @@ function GetAutomationAccount([string]$ResourceGroupName) {
 
   if ( !$ResourceGroupName) { throw "ResourceGroupName Required" }
 
-  return (Get-AzureRmAutomationAccount -ResourceGroupName $ResourceGroupName).AutomationAccountName
+  return (Get-AzAutomationAccount -ResourceGroupName $ResourceGroupName).AutomationAccountName
 }
 function GetStorageAccountKey([string]$ResourceGroupName, [string]$StorageAccountName) {
   # Required Argument $1 = RESOURCE_GROUP
@@ -97,48 +98,48 @@ function GetStorageAccountKey([string]$ResourceGroupName, [string]$StorageAccoun
   if ( !$ResourceGroupName) { throw "ResourceGroupName Required" }
   if ( !$StorageAccountName) { throw "StorageAccountName Required" }
 
-  return (Get-AzureRmStorageAccountKey -ResourceGroupName $ResourceGroupName -AccountName $StorageAccountName).Value[0]
+  return (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroupName -AccountName $StorageAccountName).Value[0]
 }
 function GetKeyVault([string]$ResourceGroupName) {
   # Required Argument $1 = RESOURCE_GROUP
 
   if ( !$ResourceGroupName) { throw "ResourceGroupName Required" }
 
-  return (Get-AzureRmKeyVault -ResourceGroupName $ResourceGroupName).VaultName
+  return (Get-AzKeyVault -ResourceGroupName $ResourceGroupName).VaultName
 }
 function Create-Container ($ResourceGroupName, $ContainerName, $Access = "Off") {
   # Required Argument $1 = RESOURCE_GROUP
   # Required Argument $2 = CONTAINER_NAME
 
   # Get Storage Account
-  $StorageAccount = Get-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName
+  $StorageAccount = Get-AzStorageAccount -ResourceGroupName $ResourceGroupName
   if (!$StorageAccount) {
     Write-Error -Message "Storage Account in $ResourceGroupName not found. Please fix and continue"
     return
   }
 
-  $Keys = Get-AzureRmStorageAccountKey -Name $StorageAccount.StorageAccountName -ResourceGroupName $ResourceGroupName
-  $StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccount.StorageAccountName -StorageAccountKey $Keys[0].Value
+  $Keys = Get-AzStorageAccountKey -Name $StorageAccount.StorageAccountName -ResourceGroupName $ResourceGroupName
+  $StorageContext = New-AzStorageContext -StorageAccountName $StorageAccount.StorageAccountName -StorageAccountKey $Keys[0].Value
 
-  $Container = Get-AzureStorageContainer -Name $ContainerName -Context $StorageContext -ErrorAction SilentlyContinue
+  $Container = Get-AzStorageContainer -Name $ContainerName -Context $StorageContext -ErrorAction SilentlyContinue
   if (!$Container) {
     Write-Warning -Message "Storage Container $ContainerName not found. Creating the Container $ContainerName"
-    New-AzureStorageContainer -Name $ContainerName -Context $StorageContext -Permission $Access
+    New-AzStorageContainer -Name $ContainerName -Context $StorageContext -Permission $Access
   }
 }
 function Upload-File ($ResourceGroupName, $ContainerName, $FileName, $BlobName) {
 
   # Get Storage Account
-  $StorageAccount = Get-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName
+  $StorageAccount = Get-AzStorageAccount -ResourceGroupName $ResourceGroupName
   if (!$StorageAccount) {
     Write-Error -Message "Storage Account in $ResourceGroupName not found. Please fix and continue"
     return
   }
 
-  $Keys = Get-AzureRmStorageAccountKey -Name $StorageAccount.StorageAccountName `
+  $Keys = Get-AzStorageAccountKey -Name $StorageAccount.StorageAccountName `
     -ResourceGroupName $ResourceGroupName
 
-  $StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccount.StorageAccountName `
+  $StorageContext = New-AzStorageContext -StorageAccountName $StorageAccount.StorageAccountName `
     -StorageAccountKey $Keys[0].Value
 
   ### Upload a file to the Microsoft Azure Storage Blob Container
@@ -150,28 +151,28 @@ function Upload-File ($ResourceGroupName, $ContainerName, $FileName, $BlobName) 
     Blob      = $BlobName;
   }
 
-  Set-AzureStorageBlobContent @UploadFile -Force;
+  Set-AzStorageBlobContent @UploadFile -Force;
 }
 function GetSASToken ($ResourceGroupName, $StorageAccountName, $ContainerName) {
 
   # Get Storage Account
-  $StorageAccount = Get-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName -Name $StorageAccountName
+  $StorageAccount = Get-AzStorageAccount -ResourceGroupName $ResourceGroupName -Name $StorageAccountName
   if (!$StorageAccount) {
     Write-Error -Message "Storage Account in $ResourceGroupName not found. Please fix and continue"
     return
   }
 
-  $Keys = Get-AzureRmStorageAccountKey -Name $StorageAccount.StorageAccountName `
+  $Keys = Get-AzStorageAccountKey -Name $StorageAccount.StorageAccountName `
     -ResourceGroupName $ResourceGroupName
 
-  $StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccount.StorageAccountName `
+  $StorageContext = New-AzStorageContext -StorageAccountName $StorageAccount.StorageAccountName `
     -StorageAccountKey $Keys[0].Value
 
-  return New-AzureStorageContainerSASToken -Name $ContainerName -Context $StorageContext -Permission r -ExpiryTime (Get-Date).AddMinutes(20)
+  return New-AzStorageContainerSASToken -Name $ContainerName -Context $StorageContext -Permission r -ExpiryTime (Get-Date).AddMinutes(20)
 }
 function Import-DscConfiguration ($script, $config, $ResourceGroup, $Force) {
 
-  $AutomationAccount = (Get-AzureRmAutomationAccount -ResourceGroupName $ResourceGroup).AutomationAccountName
+  $AutomationAccount = (Get-AzAutomationAccount -ResourceGroupName $ResourceGroup).AutomationAccountName
 
   $dscConfig = Join-Path $DscPath ($script + ".ps1")
   $dscDataConfig = Join-Path $DscPath $config
@@ -182,7 +183,7 @@ function Import-DscConfiguration ($script, $config, $ResourceGroup, $Force) {
   $dscDataConfigFile = (Get-Item $dscDataConfig).FullName
   $dscDataConfigFileName = [io.path]::GetFileNameWithoutExtension($dscDataConfigFile)
 
-  $dsc = Get-AzureRmAutomationDscConfiguration `
+  $dsc = Get-AzAutomationDscConfiguration `
     -Name $dscConfigFileName `
     -ResourceGroupName $ResourceGroup `
     -AutomationAccountName $AutomationAccount `
@@ -194,7 +195,7 @@ function Import-DscConfiguration ($script, $config, $ResourceGroup, $Force) {
   else {
     Write-Output "Importing & compiling DSC configuration $dscConfigFileName"
 
-    Import-AzureRmAutomationDscConfiguration `
+    Import-AzAutomationDscConfiguration `
       -AutomationAccountName $AutomationAccount `
       -ResourceGroupName $ResourceGroup `
       -Published `
@@ -204,25 +205,25 @@ function Import-DscConfiguration ($script, $config, $ResourceGroup, $Force) {
     $configContent = (Get-Content $dscDataConfigFile | Out-String)
     Invoke-Expression $configContent
 
-    $compiledJob = Start-AzureRmAutomationDscCompilationJob `
+    $compiledJob = Start-AzAutomationDscCompilationJob `
       -ResourceGroupName $ResourceGroup `
       -AutomationAccountName $AutomationAccount `
       -ConfigurationName $dscConfigFileName `
       -ConfigurationData $ConfigData
 
     while ($null -eq $compiledJob.EndTime -and $null -eq $compiledJob.Exception) {
-      $compiledJob = $compiledJob | Get-AzureRmAutomationDscCompilationJob
+      $compiledJob = $compiledJob | Get-AzRmAutomationDscCompilationJob
       Start-Sleep -Seconds 3
       Write-Output "Compiling Configuration ..."
     }
 
     Write-Output "Compilation Complete!"
-    $compiledJob | Get-AzureRmAutomationDscCompilationJobOutput
+    $compiledJob | Get-AzRmAutomationDscCompilationJobOutput
   }
 }
 function Import-Credential ($CredentialName, $UserName, $UserPassword, $AutomationAccount, $ResourceGroup) {
 
-  $cred = Get-AzureRmAutomationCredential `
+  $cred = Get-AzRmAutomationCredential `
     -Name $CredentialName `
     -ResourceGroupName $ResourceGroup `
     -AutomationAccountName $AutomationAccount `
@@ -234,7 +235,7 @@ function Import-Credential ($CredentialName, $UserName, $UserPassword, $Automati
 
     $cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName, $UserPassword
 
-    New-AzureRmAutomationCredential `
+    New-AzAutomationCredential `
       -Name $CredentialName `
       -ResourceGroupName $ResourceGroup `
       -AutomationAccountName $AutomationAccount `
@@ -243,7 +244,7 @@ function Import-Credential ($CredentialName, $UserName, $UserPassword, $Automati
   }
 }
 function Import-Variable ($name, $value, $ResourceGroup, $AutomationAccount) {
-  $variable = Get-AzureRmAutomationVariable `
+  $variable = Get-AzRmAutomationVariable `
     -Name $name `
     -ResourceGroupName $ResourceGroup `
     -AutomationAccountName $AutomationAccount `
@@ -253,7 +254,7 @@ function Import-Variable ($name, $value, $ResourceGroup, $AutomationAccount) {
     Set-StrictMode -off
     Write-Output "Importing $VariableName credential into the Automation Account $account"
 
-    New-AzureRmAutomationVariable `
+    New-AzAutomationVariable `
       -Name $name `
       -Value $value `
       -Encrypted $false `
@@ -266,13 +267,13 @@ function Add-NodesViaFilter ($filter, $group, $dscAccount, $dscGroup, $dscConfig
   Write-Color -Text "Register VM with name like ", "$filter ", "found in ", "$group ", "and apply config ", "$dscConfig", "..." -Color Green, Red, Green, Red, Green, Cyan, Green
   Write-Color -Text "---------------------------------------------------- "-Color Yellow
 
-  Get-AzureRMVM -ResourceGroupName $group | Where-Object { $_.Name -like $filter } | `
+  Get-AzRMVM -ResourceGroupName $group | Where-Object { $_.Name -like $filter } | `
     ForEach-Object {
     $vmName = $_.Name
     $vmLocation = $_.Location
     $vmGroup = $_.ResourceGroupName
 
-    $dscNode = Get-AzureRmAutomationDscNode `
+    $dscNode = Get-AzAutomationDscNode `
       -Name $vmName `
       -ResourceGroupName $dscGroup `
       -AutomationAccountName $dscAccount `
@@ -280,7 +281,7 @@ function Add-NodesViaFilter ($filter, $group, $dscAccount, $dscGroup, $dscConfig
 
     if ( !$dscNode ) {
       Write-Color -Text "Registering $vmName" -Color Yellow
-      Register-AzureRmAutomationDscNode `
+      Register-AzAutomationDscNode `
         -AzureVMName $vmName `
         -AzureVMResourceGroup $vmGroup `
         -AzureVMLocation $vmLocation `
@@ -299,10 +300,10 @@ function GetADGroup([string]$GroupName) {
 
   if ( !$GroupName) { throw "GroupName Required" }
 
-  $Group = Get-AzureADGroup -Filter "DisplayName eq '$GroupName'"
+  $Group = Get-AzADGroup -Filter "DisplayName eq '$GroupName'"
   if (!$Group) {
     Write-Color -Text "Creating AD Group $GroupName" -Color Yellow
-    $Group = New-AzureADGroup -DisplayName $GroupName -MailEnabled $false -SecurityEnabled $true -MailNickName $GroupName
+    $Group = New-AzADGroup -DisplayName $GroupName -MailEnabled $false -SecurityEnabled $true -MailNickName $GroupName
   }
   else {
     Write-Color -Text "AD Group ", "$GroupName ", "already exists." -Color Green, Red, Green
@@ -314,12 +315,12 @@ function GetADuser([string]$Email) {
 
   if (!$Email) { throw "Email Required" }
 
-  $user = Get-AzureADUser -Filter "userPrincipalName eq '$Email'"
+  $user = Get-AzADUser -Filter "userPrincipalName eq '$Email'"
   if (!$User) {
     Write-Color -Text "Creating AD User $Email" -Color Yellow
     $PasswordProfile = New-Object -TypeName Microsoft.Open.AzureAD.Model.PasswordProfile
     $NickName = ($Email -split '@')[0]
-    New-AzureADUser -DisplayName "New User" -PasswordProfile $PasswordProfile -UserPrincipalName $Email -AccountEnabled $true -MailNickName $NickName
+    New-AzADUser -DisplayName "New User" -PasswordProfile $PasswordProfile -UserPrincipalName $Email -AccountEnabled $true -MailNickName $NickName
   }
   else {
     Write-Color -Text "AD User ", "$Email", " already exists." -Color Green, Red, Green
@@ -338,44 +339,39 @@ function AssignADGroup($Email, $Group) {
   $Groups = New-Object Microsoft.Open.AzureAD.Model.GroupIdsForMembershipCheck
   $Groups.GroupIds = $Group.ObjectId
 
-  $IsMember = Select-AzureADGroupIdsUserIsMemberOf  -ObjectId $User.ObjectId -GroupIdsForMembershipCheck $Groups
+  $IsMember = Select-AzADGroupIdsUserIsMemberOf  -ObjectId $User.ObjectId -GroupIdsForMembershipCheck $Groups
 
   if (!$IsMember) {
     Write-Color -Text "Assigning $Email into ", $Group.DisplayName -Color Yellow, Yellow
-    Add-AzureADGroupMember -ObjectId $Group.ObjectId -RefObjectId $User.ObjectId
+    Add-AzADGroupMember -ObjectId $Group.ObjectId -RefObjectId $User.ObjectId
   }
   else {
     Write-Color -Text "AD User ", "$Email", " already assigned to ", $Group.DisplayName -Color Green, Red, Green, Red
   }
 }
-function GetDbConnectionString($DatabaseServerName, $DatabaseName, $UserName, $Password)
-{
-    return "Server=tcp:{0}.database.windows.net,1433;Database={1};User ID={2}@{0};Password={3};Trusted_Connection=False;Encrypt=True;Connection Timeout=30;" -f
-        $DatabaseServerName, $DatabaseName, $UserName, $Password
+function GetDbConnectionString($DatabaseServerName, $DatabaseName, $UserName, $Password) {
+  return "Server=tcp:{0}.database.windows.net,1433;Database={1};User ID={2}@{0};Password={3};Trusted_Connection=False;Encrypt=True;Connection Timeout=30;" -f
+  $DatabaseServerName, $DatabaseName, $UserName, $Password
 }
-function Get-PlainText()
-{
-	[CmdletBinding()]
-	param
-	(
-		[parameter(Mandatory = $true)]
-		[System.Security.SecureString]$SecureString
-	)
-	BEGIN { }
-	PROCESS
-	{
-		$bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString);
+function Get-PlainText() {
+  [CmdletBinding()]
+  param
+  (
+    [parameter(Mandatory = $true)]
+    [System.Security.SecureString]$SecureString
+  )
+  BEGIN { }
+  PROCESS {
+    $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString);
 
-		try
-		{
-			return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr);
-		}
-		finally
-		{
-			[Runtime.InteropServices.Marshal]::FreeBSTR($bstr);
-		}
-	}
-	END { }
+    try {
+      return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr);
+    }
+    finally {
+      [Runtime.InteropServices.Marshal]::FreeBSTR($bstr);
+    }
+  }
+  END { }
 }
 function GetVmssInstances([string]$ResourceGroupName) {
   # Required Argument $1 = RESOURCE_GROUP
@@ -383,24 +379,24 @@ function GetVmssInstances([string]$ResourceGroupName) {
   if ( !$ResourceGroupName) { throw "ResourceGroupName Required" }
 
   $ServerNames = @()
-  $VMScaleSets = Get-AzureRmVmss -ResourceGroupName $ResourceGroupName
+  $VMScaleSets = Get-AzVmss -ResourceGroupName $ResourceGroupName
   ForEach ($VMScaleSet in $VMScaleSets) {
-    $VmssVMList = Get-AzureRmVmssVM -ResourceGroupName $ResourceGroupName -VMScaleSetName $VMScaleSet.Name
+    $VmssVMList = Get-AzRmVmssVM -ResourceGroupName $ResourceGroupName -VMScaleSetName $VMScaleSet.Name
     ForEach ($Vmss in $VmssVMList) {
-      $Name = (Get-AzureRmVmssVM -ResourceGroupName $ResourceGroupName -VMScaleSetName $VMScaleSet.Name -InstanceId $Vmss.InstanceId).OsProfile.ComputerName
+      $Name = (Get-AzRmVmssVM -ResourceGroupName $ResourceGroupName -VMScaleSetName $VMScaleSet.Name -InstanceId $Vmss.InstanceId).OsProfile.ComputerName
 
       Write-Color -Text "Adding ", $Name, " to Instance List" -Color Yellow, Red, Yellow
-      $ServerNames += (Get-AzureRmVmssVM -ResourceGroupName $ResourceGroupName -VMScaleSetName $VMScaleSet.Name -InstanceId $Vmss.InstanceId).OsProfile.ComputerName
+      $ServerNames += (Get-AzVmssVM -ResourceGroupName $ResourceGroupName -VMScaleSetName $VMScaleSet.Name -InstanceId $Vmss.InstanceId).OsProfile.ComputerName
     }
   }
   return $ServerNames
 }
 function SetSqlClientFirewallRule($SqlServerName, $RuleName, $IP) {
-  Get-AzureSqlDatabaseServerFirewallRule -ServerName $SqlServerName -RuleName $RuleName -ev notPresent -ea 0 | Out-null
+  Get-AzSqlDatabaseServerFirewallRule -ServerName $SqlServerName -RuleName $RuleName -ev notPresent -ea 0 | Out-null
 
   if ($notPresent) {
     Write-Host "Creating Sql Firewall Rule $RuleName..." -ForegroundColor Yellow
-    New-AzureSqlDatabaseServerFirewallRule -ServerName $DbServer -RuleName $RuleName -StartIpAddress $IP -EndIpAddress $IP
+    New-AzSqlDatabaseServerFirewallRule -ServerName $DbServer -RuleName $RuleName -StartIpAddress $IP -EndIpAddress $IP
   }
   else {
     Write-Color -Text "SQL Firewall Rule ", "$RuleName ", "already exists." -Color Green, Red, Green

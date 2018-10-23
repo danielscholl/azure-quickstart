@@ -10,6 +10,9 @@
     },
     "adminPassword": {
       "value": "Password1!"
+    },
+    "sshKey": {
+      "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDxgXn34xwBLXjoK8n4+NNIyvkykEbXbzp/yX2EGdWKJ4L1fW14N4myqLPOSNogk70YsntJYK5qoX0gzzgK4eIk4nmeu8lwe+PuiDESpDrJAlNgj54I2rNFct5OzYZr/0LJhb+kkR8ShcOMedZEAZ97POG0nO4a/RfSoMLu4n6JpFaQNqnzxSQlukwtTHs3CzbEC+yNYkQwG7o/oEu6gJZgHCPrEEfghMIIRxhp1vDjnpBuzazcS1h1XvlwTzEjrthkqK4NYsahur4OyQHBEuuVKL4B1ftOV6RFFf8gvkdKGz9CRiB6FGkl3UMZAhHQD0nt8JNCBd1UVjqaf1Gbx2IZ"
     }
   }
 }
