@@ -5,9 +5,8 @@
    This script will create a storage container for hosting ARM Templates.
 .EXAMPLE
 #>
-
-#Requires -Version 3.0
-#Requires -Module AzureRM.Resources
+#Requires -Version 6.1.0
+#Requires -Module @{ModuleName='Az.Resources'; ModuleVersion='0.3.0'}
 
 Param(
   [Parameter(Mandatory = $true)]
@@ -26,16 +25,16 @@ Param(
 function Upload-Template ($ResourceGroupName, $ContainerName, $QuickStart, $BlobName) {
 
   # Get Storage Account
-  $StorageAccount = Get-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName
+  $StorageAccount = Get-AzStorageAccount -ResourceGroupName $ResourceGroupName
   if (!$StorageAccount) {
     Write-Error -Message "Storage Account in $ResourceGroupName not found. Please fix and continue"
     return
   }
 
-  $Keys = Get-AzureRmStorageAccountKey -Name $StorageAccount.StorageAccountName `
+  $Keys = Get-AzStorageAccountKey -Name $StorageAccount.StorageAccountName `
     -ResourceGroupName $ResourceGroupName
 
-  $StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccount.StorageAccountName `
+  $StorageContext = New-AzStorageContext -StorageAccountName $StorageAccount.StorageAccountName `
     -StorageAccountKey $Keys[0].Value
 
   ### Upload a file to the Microsoft Azure Storage Blob Container
@@ -47,7 +46,7 @@ function Upload-Template ($ResourceGroupName, $ContainerName, $QuickStart, $Blob
     Blob      = $BlobName;
   }
 
-  Set-AzureStorageBlobContent @UploadFile -Force;
+  Set-AzStorageBlobContent @UploadFile -Force;
 }
 
 Upload-Template $ResourceGroupName $ContainerName $QuickStart $BlobName

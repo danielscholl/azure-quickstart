@@ -5,11 +5,10 @@
 .DESCRIPTION
    This script will import a variable via powershell into a provided automation account.
 .EXAMPLE
-
 #>
+#Requires -Version 6.1.0
+#Requires -Module @{ModuleName='Az.Resources'; ModuleVersion='0.3.0'}
 
-#Requires -Version 3.0
-#Requires -Module AzureRM.Resources
 
 Param(
   [Parameter(Mandatory = $true)]
@@ -28,7 +27,7 @@ Param(
 function Import-Variable ($name, $value, $ResourceGroup, $AutomationAccount) {
 
 
-  $variable = Get-AzureRmAutomationVariable `
+  $variable = Get-AzAutomationVariable `
     -Name $name `
     -ResourceGroupName $ResourceGroup `
     -AutomationAccountName $AutomationAccount `
@@ -38,7 +37,7 @@ function Import-Variable ($name, $value, $ResourceGroup, $AutomationAccount) {
     Set-StrictMode -off
     Write-Output "Importing $VariableName credential into the Automation Account $account"
 
-    New-AzureRmAutomationVariable `
+    New-AzAutomationVariable `
       -Name $name `
       -Value $value `
       -Encrypted $false `

@@ -7,6 +7,8 @@
 .EXAMPLE
 
 #>
+#Requires -Version 6.1.0
+#Requires -Module @{ModuleName='Az.Resources'; ModuleVersion='0.3.0'}
 
 
 Param(
@@ -24,7 +26,7 @@ Param(
 
 function Import-DscConfiguration ($script, $config, $ResourceGroup) {
 
-  $AutomationAccount = (Get-AzureRmAutomationAccount -ResourceGroupName $ResourceGroup).AutomationAccountName
+  $AutomationAccount = (Get-AzAutomationAccount -ResourceGroupName $ResourceGroup).AutomationAccountName
 
   $dscConfig = Join-Path $DscPath ($script + ".ps1")
   $dscDataConfig = Join-Path $DscPath $config
@@ -35,7 +37,7 @@ function Import-DscConfiguration ($script, $config, $ResourceGroup) {
   $dscDataConfigFile = (Get-Item $dscDataConfig).FullName
   $dscDataConfigFileName = [io.path]::GetFileNameWithoutExtension($dscDataConfigFile)
 
-  $dsc = Get-AzureRmAutomationDscConfiguration `
+  $dsc = Get-AzAutomationDscConfiguration `
     -Name $dscConfigFileName `
     -ResourceGroupName $ResourceGroup `
     -AutomationAccountName $AutomationAccount `
@@ -47,7 +49,7 @@ function Import-DscConfiguration ($script, $config, $ResourceGroup) {
   else {
     Write-Output "Importing & compiling DSC configuration $dscConfigFileName"
 
-    Import-AzureRmAutomationDscConfiguration `
+    Import-AzAutomationDscConfiguration `
       -AutomationAccountName $AutomationAccount `
       -ResourceGroupName $ResourceGroup `
       -Published `
@@ -57,20 +59,20 @@ function Import-DscConfiguration ($script, $config, $ResourceGroup) {
     $configContent = (Get-Content $dscDataConfigFile | Out-String)
     Invoke-Expression $configContent
 
-    $compiledJob = Start-AzureRmAutomationDscCompilationJob `
+    $compiledJob = Start-AzAutomationDscCompilationJob `
       -ResourceGroupName $ResourceGroup `
       -AutomationAccountName $AutomationAccount `
       -ConfigurationName $dscConfigFileName `
       -ConfigurationData $ConfigData
 
     while ($null -eq $compiledJob.EndTime -and $null -eq $compiledJob.Exception) {
-      $compiledJob = $compiledJob | Get-AzureRmAutomationDscCompilationJob
+      $compiledJob = $compiledJob | Get-AzAutomationDscCompilationJob
       Start-Sleep -Seconds 3
       Write-Output "Compiling Configuration ..."
     }
 
     Write-Output "Compilation Complete!"
-    $compiledJob | Get-AzureRmAutomationDscCompilationJobOutput
+    $compiledJob | Get-AzAutomationDscCompilationJobOutput
   }
 
 }

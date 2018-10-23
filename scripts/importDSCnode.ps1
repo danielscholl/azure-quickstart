@@ -1,4 +1,14 @@
+<# Copyright (c) 2017
+.Synopsis
+   Imports a DSC Node into an automation account
+   Adapted from blog posts by: KARIM VAES
+.DESCRIPTION
+   This script will import a dsc configuration via powershell into a provided automation account.
+.EXAMPLE
 
+#>
+#Requires -Version 6.1.0
+#Requires -Module @{ModuleName='Az.Resources'; ModuleVersion='0.3.0'}
 
 Param(
   [string] $filter,
@@ -11,13 +21,13 @@ Param(
 function Add-NodesViaFilter ($filter, $group, $dscAccount, $dscGroup, $dscConfig) {
   Write-Information -MessageData "Register VM with name like $filter found in $group and apply config $dscConfig"
 
-  Get-AzureRMVM -ResourceGroupName $group | Where-Object { $_.Name -like $filter } | `
+  Get-AzVM -ResourceGroupName $group | Where-Object { $_.Name -like $filter } | `
     ForEach-Object {
     $vmName = $_.Name
     $vmLocation = $_.Location
     $vmGroup = $_.ResourceGroupName
 
-    $dscNode = Get-AzureRmAutomationDscNode `
+    $dscNode = Get-AzAutomationDscNode `
       -Name $vmName `
       -ResourceGroupName $dscGroup `
       -AutomationAccountName $dscAccount `
@@ -25,7 +35,7 @@ function Add-NodesViaFilter ($filter, $group, $dscAccount, $dscGroup, $dscConfig
 
     if ( !$dscNode ) {
       Write-Information -MessageData "Registering $vmName"
-      Register-AzureRmAutomationDscNode `
+      Register-AzAutomationDscNode `
         -AzureVMName $vmName `
         -AzureVMResourceGroup $vmGroup `
         -AzureVMLocation $vmLocation `

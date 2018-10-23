@@ -7,9 +7,8 @@
 .EXAMPLE
     ./importModule.ps1 -ModuleName xWebAdministration -ModuleVersion 1.18.0 -ResourceGroup iac-automation -AutomationAccount automate
 #>
-
-#Requires -Version 3.0
-#Requires -Module AzureRM.Resources
+#Requires -Version 6.1.0
+#Requires -Module @{ModuleName='Az.Resources'; ModuleVersion='0.3.0'}
 
 Param(
   [Parameter(Mandatory = $true)]
@@ -26,7 +25,7 @@ Param(
 
 function Import-DscModule ($name, $version, $account, $group) {
 
-  $module = Get-AzureRmAutomationModule `
+  $module = Get-AzAutomationModule `
     -Name $name  `
     -AutomationAccountName $account `
     -ResourceGroupName $group `
@@ -40,7 +39,7 @@ function Import-DscModule ($name, $version, $account, $group) {
     $url = "https://www.powershellgallery.com/api/v2/package/$name/$version"
 
 
-    New-AzureRmAutomationModule `
+    New-AzAutomationModule `
       -Name $name `
       -AutomationAccountName $account `
       -ResourceGroupName $group `
@@ -48,7 +47,7 @@ function Import-DscModule ($name, $version, $account, $group) {
 
     $done = ""
     while (!$done) {
-      $done = Get-AzureRmAutomationModule `
+      $done = Get-AzAutomationModule `
         -Name $name `
         -AutomationAccountName $account `
         -ResourceGroupName $group `

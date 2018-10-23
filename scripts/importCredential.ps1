@@ -8,8 +8,8 @@
 
 #>
 
-#Requires -Version 3.0
-#Requires -Module AzureRM.Resources
+#Requires -Version 6.1.0
+#Requires -Module @{ModuleName='Az.Resources'; ModuleVersion='0.3.0'}
 
 Param(
   [Parameter(Mandatory = $true)]
@@ -30,7 +30,7 @@ Param(
 
 function Import-Credential ($CredentialName, $UserName, $UserPassword, $AutomationAccount, $ResourceGroup) {
 
-  $cred = Get-AzureRmAutomationCredential `
+  $cred = Get-AzAutomationCredential `
     -Name $CredentialName `
     -ResourceGroupName $ResourceGroup `
     -AutomationAccountName $AutomationAccount `
@@ -42,7 +42,7 @@ function Import-Credential ($CredentialName, $UserName, $UserPassword, $Automati
 
     $cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName, $UserPassword
 
-    New-AzureRmAutomationCredential `
+    New-AzAutomationCredential `
       -Name $CredentialName `
       -ResourceGroupName $ResourceGroup `
       -AutomationAccountName $AutomationAccount `

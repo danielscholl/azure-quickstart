@@ -6,8 +6,8 @@
 .EXAMPLE
 #>
 
-#Requires -Version 3.0
-#Requires -Module AzureRM.Resources
+#Requires -Version 6.1.0
+#Requires -Module @{ModuleName='Az.Resources'; ModuleVersion='0.3.0'}
 
 Param(
   [Parameter(Mandatory = $true)]
@@ -20,19 +20,19 @@ Param(
 function Create-Container ($ResourceGroupName, $ContainerName) {
 
   # Get Storage Account
-  $StorageAccount = Get-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName
+  $StorageAccount = Get-AzStorageAccount -ResourceGroupName $ResourceGroupName
   if (!$StorageAccount) {
     Write-Error -Message "Storage Account in $ResourceGroupName not found. Please fix and continue"
     return
   }
 
-  $Keys = Get-AzureRmStorageAccountKey -Name $StorageAccount.StorageAccountName -ResourceGroupName $ResourceGroupName
-  $StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccount.StorageAccountName -StorageAccountKey $Keys[0].Value
+  $Keys = Get-AzStorageAccountKey -Name $StorageAccount.StorageAccountName -ResourceGroupName $ResourceGroupName
+  $StorageContext = New-AzStorageContext -StorageAccountName $StorageAccount.StorageAccountName -StorageAccountKey $Keys[0].Value
 
-  $Container = Get-AzureStorageContainer -Name $ContainerName -Context $StorageContext -ErrorAction SilentlyContinue
+  $Container = Get-AzStorageContainer -Name $ContainerName -Context $StorageContext -ErrorAction SilentlyContinue
   if (!$Container) {
     Write-Warning -Message "Storage Container $ContainerName not found. Creating the Container $ContainerName"
-    New-AzureStorageContainer -Name $ContainerName -Context $StorageContext -Permission Off
+    New-AzStorageContainer -Name $ContainerName -Context $StorageContext -Permission Off
   }
 
   # Set Global VSTS Task Variable $env:StorageAccount
