@@ -48,21 +48,21 @@ az account set --subscription ${AZURE_SUBSCRIPTION}
 #######################################
 ## Retrieving Parameter Information  ##
 #######################################
-tput setaf 2; echo "Gathering information for Diagnostics Storage Account..." ; tput sgr0
-STORAGE_ACCOUNT=$(GetStorageAccount $COMMON_GROUP)
-echo $STORAGE_ACCOUNT
+# tput setaf 2; echo "Gathering information for Diagnostics Storage Account..." ; tput sgr0
+# STORAGE_ACCOUNT=$(GetStorageAccount $COMMON_GROUP)
+# echo $STORAGE_ACCOUNT
 
-tput setaf 2; echo "Retrieving Connection for Storage Account ${STORAGE_ACCOUNT}..." ; tput sgr0
-CONNECTION=$(GetStorageConnection ${COMMON_GROUP} ${STORAGE_ACCOUNT})
-echo $CONNECTION
+# tput setaf 2; echo "Retrieving Connection for Storage Account ${STORAGE_ACCOUNT}..." ; tput sgr0
+# CONNECTION=$(GetStorageConnection ${COMMON_GROUP} ${STORAGE_ACCOUNT})
+# echo $CONNECTION
 
-tput setaf 2; echo 'Generating a SAS Token for Container...' ; tput sgr0
-TOKEN=$(CreateSASToken ${TEMPLATE_CONTAINER} ${CONNECTION})
-echo $TOKEN
+# tput setaf 2; echo 'Generating a SAS Token for Container...' ; tput sgr0
+# TOKEN=$(CreateSASToken ${TEMPLATE_CONTAINER} ${CONNECTION})
+# echo $TOKEN
 
-tput setaf 2; echo "Gathering information for Key Vault..." ; tput sgr0
-KEY_VAULT=$(GetKeyVault $COMMON_GROUP)
-echo $KEY_VAULT
+# tput setaf 2; echo "Gathering information for Key Vault..." ; tput sgr0
+# KEY_VAULT=$(GetKeyVault $COMMON_GROUP)
+# echo $KEY_VAULT
 
 
 if [ -d ./scripts ]; then BASE_DIR=$PWD; else BASE_DIR=$(dirname $PWD); fi
@@ -70,5 +70,4 @@ if [ -d ./scripts ]; then BASE_DIR=$PWD; else BASE_DIR=$(dirname $PWD); fi
 az group deployment create \
   --template-file $BASE_DIR/dbas-sqldatabase/azuredeploy.json \
   --parameters $BASE_DIR/dbas-sqldatabase/azuredeploy.parameters.json \
-  --parameters sasToken=?$TOKEN \
   --resource-group $RESOURCE_GROUP

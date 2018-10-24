@@ -1,0 +1,85 @@
+{  
+   "$schema":"http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+   "contentVersion":"1.0.0.0",
+   "parameters":{
+    "prefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Small unique string."
+      },
+      "minLength": 2,
+      "maxLength": 11
+    }
+   },
+   "variables":{
+      "cleanUnique": "[toLower(replace(parameters('prefix'),'-', ''))]",
+      "siteName": "[concat(variables('cleanUnique'), uniqueString(resourceGroup().id), '-web')]",
+      "hostingPlanName":"[concat(parameters('prefix'), '-plan')]"
+   },
+   "resources":[  
+      {  
+         "type":"Microsoft.Web/sites",
+         "name":"[variables('siteName')]",
+         "dependsOn":[  
+            "[variables('hostingPlanName')]"
+         ],
+         "properties":{  
+            "name":"[variables('siteName')]",
+            "serverFarmId":"[variables('hostingPlanName')]",
+            "hostingEnvironment":""
+         },
+         "apiVersion":"2016-03-01",
+         "location":"[resourceGroup().location]",
+         "resources": [
+          {
+            "apiVersion": "2016-08-01",
+            "name": "web",
+            "type": "sourcecontrols",
+            "dependsOn": [
+              "[resourceId('Microsoft.Web/Sites', variables('siteName'))]"
+            ],
+            "properties": {
+              "RepoUrl": "https://github.com/danielscholl/demo-appgw-path-code.git",
+              "branch": "master",
+              "IsManualIntegration": true
+            }
+          },
+          {
+            "apiVersion": "2016-08-01",
+            "name": "logs",
+            "type": "config",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/Sites', variables('siteName'))]"
+            ],
+            "properties": {
+              "httpLogs": {
+                "fileSystem": {
+                  "retentionInMb": 100,
+                  "retentionInDays": 90,
+                  "enabled": true
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "comments": "## App Service Plan ##",
+        "name": "[variables('hostingPlanName')]",
+        "type": "Microsoft.Web/serverfarms",
+        "apiVersion": "2015-08-01",
+        "location": "[resourceGroup().location]",
+        "sku": {
+          "Tier": "Standard",
+          "Name": "S1"
+        },
+        "properties": {
+          "name": "[variables('hostingPlanName')]",
+          "workerSizeId": "0",
+          "reserved": false,
+          "numberOfWorkers": 1,
+          "hostingEnvironment": ""
+        }
+      }
+   ]
+}
