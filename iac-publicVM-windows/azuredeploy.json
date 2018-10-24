@@ -7,8 +7,8 @@
       "metadata": {
         "description": "Small unique string."
       },
-      "minLength": 3,
-      "maxLength": 6
+      "minLength": 2,
+      "maxLength": 9
     },
     "vmName": {
       "type": "string",
@@ -16,7 +16,7 @@
         "description": "Virtual Machine 1 Server Name."
       },
       "minLength": 2,
-      "maxLength": 4
+      "maxLength": 15
     },
     "vmSize": {
       "type": "string",
@@ -45,11 +45,11 @@
     "useImage": {
       "type": "string",
       "allowedValues": [
-          "Yes",
-          "No"
+        "Yes",
+        "No"
       ],
       "metadata": {
-          "description": "Select whether an image should be used to create resource."
+        "description": "Select whether an image should be used to create resource."
       }
     },
     "managedImageId": {
@@ -122,7 +122,8 @@
     "wadmetricsresourceid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name , '/providers/', 'Microsoft.Compute/virtualMachines/')]",
     "wadcfgxend": "\"><MetricAggregation scheduledTransferPeriod=\"PT1H\"/><MetricAggregation scheduledTransferPeriod=\"PT1M\"/></Metrics></DiagnosticMonitorConfiguration></WadCfg>"
   },
-  "resources": [{
+  "resources": [
+    {
       "comments": "## Network Security Group ##",
       "name": "[concat(variables('NsgName'))]",
       "type": "Microsoft.Network/networkSecurityGroups",
@@ -132,20 +133,22 @@
         "Company": "[parameters('prefix')]"
       },
       "properties": {
-        "securityRules": [{
-          "name": "default-allow-rdp",
-          "properties": {
-            "description": "Allow RDP",
-            "protocol": "Tcp",
-            "sourcePortRange": "*",
-            "destinationPortRange": "3389",
-            "sourceAddressPrefix": "[parameters('remoteAccessACL')]",
-            "destinationAddressPrefix": "*",
-            "access": "Allow",
-            "priority": 1000,
-            "direction": "Inbound"
+        "securityRules": [
+          {
+            "name": "default-allow-rdp",
+            "properties": {
+              "description": "Allow RDP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "[parameters('remoteAccessACL')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1000,
+              "direction": "Inbound"
+            }
           }
-        }]
+        ]
       }
     },
     {
@@ -175,26 +178,22 @@
         "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NsgName'))]"
       ],
       "properties": {
-        "ipConfigurations": [{
-          "name": "ipconfig1",
-          "properties": {
-            "privateIPAllocationMethod": "Dynamic",
-            "publicIPAddress": {
-              "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPName'))]"
-            },
-            "subnet": {
-              "id": "[variables('subnetRef')]"
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPName'))]"
+              },
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              }
             }
           }
-        }],
+        ],
         "networkSecurityGroup": {
           "id": "[variables('nsgId')]"
-        },
-        "diagnosticsProfile": {
-          "bootDiagnostics": {
-            "enabled": true,
-            "storageUri": "[concat('http://', parameters('diagnosticsStorageName'), '.blob.core.windows.net')]"
-          }
         }
       }
     },
@@ -228,13 +227,17 @@
             "version": "[if(equals(parameters('useImage'), 'Yes'), json('null'), 'latest')]"
           },
           "osDisk": {
-            "createOption": "FromImage"
+            "caching": "ReadWrite",
+            "createOption": "FromImage",
+            "diskSizeGb": 32
           }
         },
         "networkProfile": {
-          "networkInterfaces": [{
-            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('NicName'))]"
-          }]
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('NicName'))]"
+            }
+          ]
         },
         "diagnosticsProfile": {
           "bootDiagnostics": {
@@ -243,7 +246,8 @@
           }
         }
       },
-      "resources": [{
+      "resources": [
+        {
           "name": "Microsoft.Compute.BGInfoExtension",
           "type": "extensions",
           "apiVersion": "2016-04-30-preview",

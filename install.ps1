@@ -21,6 +21,7 @@ Param(
   [boolean] $Base = $false,
   [boolean] $Gateway = $false,
   [boolean] $DevOps = $false,
+  [boolean] $Bastion = $false,
   [boolean] $Server = $false
 )
 . ./.env.ps1
@@ -58,7 +59,7 @@ if ($Base -eq $true) {
 if ($DevOps -eq $true) {
   Write-Host "Install DevOps Resources here we go...." -foregroundcolor "cyan"
 
-#  & ./iac-storage/install.ps1 -ResourceGroupName $Env:AZURE_DEVOPS_GROUP
+  & ./iac-storage/install.ps1 -ResourceGroupName $Env:AZURE_DEVOPS_GROUP
   & ./iac-automation/install.ps1 -ResourceGroupName $Env:AZURE_DEVOPS_GROUP
 
   Write-Host "---------------------------------------------" -ForegroundColor "blue"
@@ -66,15 +67,23 @@ if ($DevOps -eq $true) {
   Write-Host "---------------------------------------------" -ForegroundColor "blue"
 }
 
-if($Server -eq $true) {
-  Write-Host "Install IaaS Resources here we go...." -foregroundcolor "cyan"
+if($Bastion -eq $true) {
+  Write-Host "Install Bastion Resources here we go...." -foregroundcolor "cyan"
 
-  & ./iac-publicVM-linux/install.ps1 -ResourceGroupName $Env:AZURE_IAAS_GROUP
-#  & ./iac-publicVM-windows/install.ps1 -ResourceGroupName iaas -DomainJoin $false
+  & ./iac-publicVM-linux/install.ps1 -ResourceGroupName $Env:AZURE_BASTION_GROUP
+  & ./iac-publicVM-windows/install.ps1 -ResourceGroupName $Env:AZURE_BASTION_GROUP -DomainJoin $false
 
   Write-Host "---------------------------------------------" -ForegroundColor "blue"
-  Write-Host "Devops Components have been installed!!!!!" -foregroundcolor "red"
+  Write-Host "Bastion Components have been installed!!!!!" -foregroundcolor "red"
   Write-Host "---------------------------------------------" -ForegroundColor "blue"
 }
 
+if($Server -eq $true) {
+  Write-Host "Install Server Resources here we go...." -foregroundcolor "cyan"
 
+  & ./iac-vmss-linux/install.ps1 -ResourceGroupName $Env:AZURE_SERVER_GROUP
+
+  Write-Host "---------------------------------------------" -ForegroundColor "blue"
+  Write-Host "Server Components have been installed!!!!!" -foregroundcolor "red"
+  Write-Host "---------------------------------------------" -ForegroundColor "blue"
+}

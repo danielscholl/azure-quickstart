@@ -16,7 +16,7 @@
         "description": "Virtual Machine 1 Server Name."
       },
       "minLength": 2,
-      "maxLength": 4
+      "maxLength": 15
     },
     "vmSize": {
       "type": "string",
@@ -155,12 +155,6 @@
         ],
         "networkSecurityGroup": {
           "id": "[variables('nsgId')]"
-        },
-        "diagnosticsProfile": {
-          "bootDiagnostics": {
-            "enabled": true,
-            "storageUri": "[concat('http://', parameters('diagnosticsStorageName'), '.blob.core.windows.net')]"
-          }
         }
       }
     },
@@ -205,7 +199,7 @@
           "osDisk": {
             "caching": "ReadWrite",
             "createOption": "FromImage",
-            "diskSizeGb": 64
+            "diskSizeGb": 32
           }
         },
         "networkProfile": {

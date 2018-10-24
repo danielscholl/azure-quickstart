@@ -12,13 +12,13 @@
       "value": "common-vnet"
     },
     "subnet": {
-      "value": "front_subnet"
+      "value": "dmz_subnet"
     },
     "vmName": {
-      "value": "jump-windows"
+      "value": "windows"
     },
     "vmSize": {
-      "value": "Standard_DS1_v2"
+      "value": "Standard_B1ms"
     },
     "useImage": {
       "value": "No"
