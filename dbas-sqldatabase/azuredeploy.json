@@ -18,7 +18,8 @@
       "type": "string",
       "metadata": {
         "description": "Storage Access Token to retrieve private files from storage accounts."
-      }
+      },
+      "defaultValue": "?"
     }
   },
   "variables": {
@@ -66,7 +67,7 @@
           "properties": {
             "storageKeyType": "[variables('storageKeyType')]",
             "storageKey": "[parameters('sasToken')]",
-            "storageUri": "https://cloudcodeit.blob.core.windows.net/templates/db.bacpac",
+            "storageUri": "https://cloudcodeit.blob.core.windows.net/public/Simpleapp.bacpac",
             "administratorLogin": "[parameters('sqlAdministratorLogin')]",
             "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
             "operationMode": "Import"

@@ -24,6 +24,7 @@
     "group:common": "az group create --location southcentralus --name $npm_package_config_prefix-common",
     "group:automation": "az group create --location southcentralus --name $npm_package_config_prefix-automation",
     "group:iaas": "az group create --location southcentralus --name $npm_package_config_prefix-iaas",
+    "group:paas": "az group create --location southcentralus --name $npm_package_config_prefix-paas",
     "group:db": "az group create --location southcentralus --name $npm_package_config_prefix-db",
     "group:k8s": "az group create --location eastus --name $npm_package_config_prefix-k8s",
     "provision:storage": "az group deployment create --template-file iac-storage/azuredeploy.json --parameters iac-storage/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-common",
@@ -38,7 +39,8 @@
     "provision:activedirectory": "./iaas/activedirectory/install.sh  $npm_package_config_prefix-iaas $npm_package_config_prefix-common templates",
     "provision:jumpserver": "./iaas/jumpserver/install.sh  $npm_package_config_prefix-iaas $npm_package_config_prefix-common templates",
     "provision:database": "./iaas/database/install.sh  $npm_package_config_prefix-iaas $npm_package_config_prefix-common templates",
-    "provision:azuredb": "./dbas-sqldatabase/install.sh  $npm_package_config_prefix-db $npm_package_config_prefix-common templates",
+    "provision:azuredb": "az group deployment create --template-file dbas-sqldatabase/azuredeploy.json --parameters dbas-sqldatabase/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-db",
+    "provision:webapp": "az group deployment create --template-file paas-webapp-windows/azuredeploy.json --parameters paas-webapp-windows/azuredeploy.parameters.json --resource-group $npm_package_config_prefix-paas",
     "provision:k8s": "./iaas/k8s/install.sh $npm_package_config_prefix-k8s $npm_package_config_prefix-common"
   },
   "author": "",
