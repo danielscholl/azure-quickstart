@@ -14,7 +14,8 @@
 #Requires -Module @{ModuleName='Az.Resources'; ModuleVersion='0.3.0'}
 
 Param(
-  [string] $ResourceGroupName = $env:AZURE_IAAS_GROUP,
+  [Parameter(Mandatory = $true)]
+  [string] $ResourceGroupName,
 
   [Parameter(Mandatory = $true)]
   [String]$Name,
